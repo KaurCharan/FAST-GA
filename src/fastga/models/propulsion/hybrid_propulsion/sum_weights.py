@@ -22,6 +22,7 @@ class SummationWeights(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         summation = inputs["fuelcell_weight"] + inputs["converter_weight"] + inputs["battery_weight"] + \
-                    inputs["switch_weight"] + inputs["motor_weight"] + inputs["cables_weight"]
+                    inputs["switch_weight"] + inputs["motor_weight"] + inputs["cables_weight"] + \
+                    1 * inputs["data:propulsion:controller:number"]
 
-        outputs["data:propulsion:total_weight"] = summation + 1 * inputs["data:propulsion:controller:number"]
+        outputs["data:propulsion:total_weight"] = summation
