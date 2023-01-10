@@ -1,0 +1,263 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct 18 15:18:28 2022
+
+@author: Charan
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import interp1d
+import math
+
+import fastoad.api as oad
+import openmdao.api as om
+
+from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_FUELCELL_PARAMETERS
+
+
+@oad.RegisterSubmodel(SUBMODEL_FUELCELL_PARAMETERS,
+                      "fastga.submodel.propulsion.hybrid_propulsion.fuelcell.legacy")
+class FuelcellParameters(om.ExplicitComponent):
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
+    def setup(self):
+        number_of_points = self.options["number_of_points"]
+
+        self.add_input("mechanical_power")
+        self.add_input("data:mission:sizing:takeoff:duration")
+        self.add_input("data:propulsion:fuelcell:current")  ##### check
+        self.add_input("data:propulsion:voltage")  ####
+
+        self.add_input("motor_efficiency", val=0.85)
+        self.add_input("fuelcell_efficiency", val=0.50)
+        self.add_input("switch_efficiency", val=0.95)
+        self.add_input("gearbox_efficiency", val=0.98)
+        self.add_input("controller_efficiency", val=0.95)
+        self.add_input("bus_efficiency", val=0.95)
+        self.add_input("converter_efficiency", val=0.90)
+        self.add_input("cables_efficiency", val=0.80)
+
+        self.add_input("P_oper", val=1.0)
+        self.add_input("P_nom", val=1.0)
+        self.add_input("single_stack_mass", val=42.0)
+        self.add_input("single_stack_volume", val=0.03721536)  # in m3
+        self.add_input("cells_in_1stack", val=455)
+        self.add_input("lambdaO2", val=1.7)
+        self.add_input("H2_density_300bar", val=20.0)
+        self.add_input("H2_density_700bar", val=40.0)
+        self.add_input("H2_density_liq", val=70.0)
+        self.add_input("H2_storageEff_300bar", val=0.05)
+        self.add_input("H2_storageEff_700bar", val=0.10)
+        self.add_input("H2_storageEff_liq", val=0.20)
+        self.add_input("H2_volumeEff_300bar", val=0.50)
+        self.add_input("H2_volumeEff_700bar", val=0.50)
+        self.add_input("H2_volumeEff_liq", val=0.50)
+        self.add_input("margin", val=1.30)
+        # PEM FC paramters
+        self.add_input("V_thermo", val=1.22)
+        self.add_input("Top", val=323.15)
+        self.add_input("Rgas", val=8.315)
+        self.add_input("n", val=2.0)
+        self.add_input("F", val=96485.0)
+        self.add_input("R", val=0.0001)
+        self.add_input("alpha", val=0.195)
+        self.add_input("Io", val=0.46)
+        self.add_input("I_leak", val=10)
+        self.add_input("I_limit", val=380)
+        self.add_input("c", val=0.17)
+        self.add_input("mu_H2", val=0.95)
+
+        self.add_input(
+            "altitude_econ",
+            shape=number_of_points + 2,
+            val=np.full(number_of_points + 2, np.nan),
+            units="m",
+        )
+        self.add_input(
+            "time_step",
+            shape=number_of_points + 2,
+            val=np.full(number_of_points + 2, np.nan),
+            units="s",
+        )
+
+        self.add_output(
+            "fuelcell_weight",
+            val=1925.00,
+            units="kg",
+            desc="mass of all fuelcells",
+        )
+
+        self.add_output("data:geometry:propulsion:fuelcell:weight")
+        self.add_output("data:geometry:propulsion:fuelcell:volume")
+        self.add_output("data:geometry:propulsion:hydrogen:weight")
+        self.add_output("data:geometry:propulsion:fuelcell:air_flow")
+        self.add_output("data:geometry:propulsion:hydrogen:volume(300bar)")
+        self.add_output("data:geometry:propulsion:hydrogen:volume(700bar)")
+        self.add_output("data:geometry:propulsion:hydrogen:volume(liquid)")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
+                           * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \
+                           inputs["cables_efficiency"]
+
+        time_step = inputs["time_step"]
+        FCeff = inputs["fuelcell_efficiency"]
+        cell_current = inputs["data:propulsion:fuelcell:current"]
+        V_max = inputs["data:propulsion:voltage"]
+        P_oper = inputs["P_oper"]
+        P_nom = inputs["P_nom"]
+        single_stack_mass = inputs["single_stack_mass"]
+        single_stack_volume = inputs["single_stack_volume"]
+        cells_in_1stack = inputs["cells_in_1stack"]
+        lambdaO2 = inputs["lambdaO2"]
+        H2_density_300bar = inputs["H2_density_300bar"]
+        H2_density_700bar = inputs["H2_density_700bar"]
+        H2_density_liq = inputs["H2_density_liq"]
+        # H2_storageEff_300bar = inputs["H2_storageEff_300bar"]
+        # H2_storageEff_700bar = inputs["H2_storageEff_700bar"]
+        # H2_storageEff_liq = inputs["H2_storageEff_liq"]
+        # H2_volumeEff_300bar = inputs["H2_volumeEff_300bar"]
+        # H2_volumeEff_700bar = inputs["H2_volumeEff_700bar"]
+        # H2_volumeEff_liq = inputs["H2_volumeEff_liq"]
+        margin = inputs["margin"]
+        V_thermo = inputs["V_thermo"]
+        Top = inputs["Top"]
+        Rgas = inputs["Rgas"]
+        n = inputs["n"]
+        F = inputs["F"]
+        R = inputs["R"]
+        alpha = inputs["alpha"]
+        Io = inputs["Io"]
+        I_limit = inputs["I_limit"]
+        I_leak = inputs["I_leak"]
+        c = inputs["c"]
+        mu_H2 = inputs["mu_H2"]
+
+        mechanical_power = inputs["mechanical_power"]
+        # power and time for cruise and climb
+        electrical_power_cruise_max = max(mechanical_power[100:199]) / total_efficiency
+        electrical_power_cruise = mechanical_power[100:199] / total_efficiency
+        Cruise_Pelec_max = Climb_Pelec = TO_Pelec = electrical_power_cruise_max
+        Cruise_Pelec = electrical_power_cruise
+        Cruise_time = time_step[100:199]
+        Climb_time = time_step[0:99]
+
+        # time for TO
+        TO_time = inputs["data:mission:sizing:takeoff:duration"]
+
+        # power and time for descent
+        electrical_power_descent = mechanical_power[200:249] / total_efficiency
+        Descent_Pelec = electrical_power_descent
+        Descent_time = time_step[200:249]
+
+        # fus_dia = inputs["data:geometry:fuselage:length"]
+        I = list(range(0, 210, 10))  # Current [A]
+        V_cell = []  # Cell voltage [V]
+
+        # Calculating cell voltage for a range of current
+        for i in range(len(I)):
+            V_act = Rgas * Top * (np.log(I[i] + I_leak) - np.log(Io)) / (
+                    alpha * n * F)
+            V_ohm = I[i] * R
+            V_conc = c * np.log(I_limit / (I_limit - I[i] - I_leak))
+            delVp = 0.06 * np.log(P_oper / P_nom)
+            V_cell.append(V_thermo - V_act - V_ohm - V_conc + delVp)
+
+        # Plotting Polarization curve
+        plt.plot(I, V_cell)
+        plt.axis([0, 200, 0, 1.2])
+        plt.xlabel('Current [A]')
+        plt.ylabel('Cell Voltage [V]')
+        plt.title('Polarization Curve')
+        plt.grid()
+
+        # User chooses the current to determine cell voltage
+        cell_current = float(cell_current)
+        f_voltage = interp1d(I, V_cell)
+        cell_voltage = f_voltage(cell_current)
+        print("Corresponding cell voltage [V] is:\n ", cell_voltage)
+
+        # Take-off
+        TO_Pelec_inFC = TO_Pelec / FCeff
+        TO_H2_mass = (1.05 * 1e-8 * TO_Pelec_inFC / (mu_H2 * cell_voltage)) * TO_time
+        TO_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * TO_Pelec_inFC
+
+        # Climb
+        Climb_Pelec_inFC = Climb_Pelec / FCeff
+        Climb_H2_mass = (1.05 * 1e-8 * Climb_Pelec_inFC / (mu_H2 * cell_voltage)) * Climb_time
+        Climb_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Climb_Pelec_inFC
+
+        # Cruise
+        Cruise_Imax = Cruise_Pelec_max / V_max
+        Cruise_stacks_parallel = math.ceil(Cruise_Imax / cell_current)
+        Cruise_cells_in_series = math.ceil(V_max / cell_voltage)
+        Cruise_stacks_series = math.ceil(Cruise_cells_in_series / cells_in_1stack)
+        Cruise_stacks = Cruise_stacks_parallel * Cruise_stacks_series
+        Cruise_stack_mass = Cruise_stacks * single_stack_mass
+
+        Cruise_Pelec_inFC = Cruise_Pelec / FCeff
+        Cruise_H2_mass = (1.05 * 1e-8 * Cruise_Pelec_inFC / (mu_H2 * cell_voltage)) * Cruise_time
+        Cruise_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Cruise_Pelec_inFC
+
+        # Descent
+        Descent_Pelec_inFC = Descent_Pelec / FCeff
+        Descent_H2_mass = (1.05 * 1e-8 * Descent_Pelec_inFC / (mu_H2 * cell_voltage)) * Descent_time
+        Descent_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Descent_Pelec_inFC
+
+        # FC stack mass
+        # FC_stack_mass = max(TO_stack_mass, Climb_stack_mass, Cruise_stack_mass)
+        FC_stack_mass = Cruise_stack_mass
+
+        # FC stack volume
+        # FC_stack_volume = max(TO_stacks, Climb_stacks, Cruise_stacks) * single_stack_volume
+        FC_stack_volume = Cruise_stacks * single_stack_volume
+        # H2 mass
+        # H2_mass = TO_H2_mass + Climb_H2_mass + Cruise_H2_mass
+        H2_mass = sum(TO_H2_mass) + sum(Climb_H2_mass) + sum(Cruise_H2_mass) + sum(Descent_H2_mass)
+
+        # Air mass
+        # Air_mass = TO_air_mass + Climb_air_mass + Cruise_air_mass
+        Air_flow = max((TO_air_massflow) ,(Climb_air_massflow) ,(Cruise_air_massflow) , (Descent_air_massflow))
+
+        # Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
+        H2_volume_300bar = H2_mass * margin / H2_density_300bar
+        H2_volume_700bar = H2_mass * margin / H2_density_700bar
+        H2_volume_liq = H2_mass * margin / H2_density_liq
+
+        # # Tank Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
+        # H2tank_volume_300bar = H2_volume_300bar / H2_volumeEff_300bar
+        # H2tank_volume_700bar = H2_volume_700bar / H2_volumeEff_700bar
+        # H2tank_volume_liq = H2_volume_liq / H2_volumeEff_liq
+        # data1 = {'H2tank_volume_300bar': H2tank_volume_300bar, 'H2tank_volume_700bar': \
+        #     H2tank_volume_700bar, 'H2tank_volume_liq': H2tank_volume_liq}
+        # print('Minimum H2 tank volume is of: ', min(data1, key=data1.get))
+        #
+        # # Length of hydrogen tank for 300 bar, 700 bar and liquid form [m]
+        # H2tank_length_300bar = H2tank_volume_300bar / (math.pi * (fus_dia / 2) ** 2)
+        # H2tank_length_700bar = H2tank_volume_700bar / (math.pi * (fus_dia / 2) ** 2)
+        # H2tank_length_liq = H2tank_volume_liq / (math.pi * (fus_dia / 2) ** 2)
+        # data2 = {'H2tank_length_300bar': H2tank_length_300bar, 'H2tank_length_700bar': \
+        #     H2tank_length_700bar, 'H2tank_length_liq': H2tank_length_liq}
+        # print('Minimum H2 tank length is of: ', min(data2, key=data2.get))
+        #
+        # # Mass of hydrogen tank for 300 bar, 700 bar and liquid form [kg]
+        # H2tank_mass_300bar = (H2_mass * margin / H2_storageEff_300bar) - H2_mass * margin
+        # H2tank_mass_700bar = (H2_mass * margin / H2_storageEff_700bar) - H2_mass * margin
+        # H2tank_mass_liq = (H2_mass * margin / H2_storageEff_liq) - H2_mass * margin
+        # data3 = {'H2tank_mass_300bar': H2tank_mass_300bar, 'H2tank_mass_700bar': \
+        #     H2tank_mass_700bar, 'H2tank_mass_liq': H2tank_mass_liq}
+        # print('Minimum H2 tank mass is of: ', min(data3, key=data3.get))
+
+        outputs["fuelcell_Pelec_max"] = Cruise_Pelec_max
+        outputs["fuelcell_weight"] = FC_stack_mass
+        outputs["data:geometry:propulsion:fuelcell:weight"] = FC_stack_mass
+        outputs["data:geometry:propulsion:fuelcell:volume"] = FC_stack_volume
+        outputs["data:geometry:propulsion:hydrogen:weight"] = H2_mass
+        outputs["data:geometry:propulsion:fuelcell:air_flow"] = Air_flow
+        outputs["data:geometry:propulsion:hydrogen:volume(300bar)"] = H2_volume_300bar
+        outputs["data:geometry:propulsion:hydrogen:volume(700bar)"] = H2_volume_700bar
+        outputs["data:geometry:propulsion:hydrogen:volume(liquid)"] = H2_volume_liq

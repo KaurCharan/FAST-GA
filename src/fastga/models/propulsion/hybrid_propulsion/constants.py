@@ -1,0 +1,8 @@
+SUBMODEL_MOTOR_MASS = "submodel.propulsion.hybrid_propulsion.motor"
+SUBMODEL_BATTERY_PARAMETERS = "submodel.propulsion.hybrid_propulsion.battery"
+SUBMODEL_SWITCH_MASS = "fastga.submodel.propulsion.hybrid_propulsion.switch"
+SUBMODEL_CABLES_MASS = "fastga.submodel.propulsion.hybrid_propulsion.cables"
+SUBMODEL_CONVERTER_MASS = "fastga.submodel.propulsion.hybrid_propulsion.converter"
+SUBMODEL_FUELCELL_PARAMETERS = "fastga.submodel.propulsion.hybrid_propulsion.fuelcell"
+SUBMODEL_COMPUTE_POWER = "fastga.submodel.propulsion.hybrid_propulsion.power.legacy"
+SUBMODEL_SUMMATION_WEIGHTS = "fastga.submodel.propulsion.hybrid_propulsion.summation.legacy"
