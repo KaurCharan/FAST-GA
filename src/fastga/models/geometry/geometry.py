@@ -26,6 +26,7 @@ from fastga.models.geometry.geom_components import (
 from fastga.models.geometry.geom_components.fuselage.compute_fuselage import (
     ComputeFuselageAlternate,
     ComputeFuselageLegacy,
+    ComputeFuselageH2,
 )
 
 from fastga.models.options import CABIN_SIZING_OPTION
@@ -152,6 +153,73 @@ class GeometryFixedTailDistance(om.Group):
         )
         self.add_subsystem(
             "compute_engine_nacelle",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_NACELLE_POSITION),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "compute_propeller_geometry",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_PROPELLER_GEOMETRY),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "compute_lg",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_LANDING_GEAR_GEOMETRY),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "compute_tank", oad.RegisterSubmodel.get_submodel(SUBMODEL_MFW), promotes=["*"]
+        )
+        self.add_subsystem(
+            "compute_total_area",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_AIRCRAFT_WET_AREA),
+            promotes=["*"],
+        )
+
+
+@oad.RegisterOpenMDAOSystem("fastga.geometry.hydrogen", domain=ModelDomain.GEOMETRY)
+class GeometryHydrogenFuselage(om.Group):
+    """
+    Computes geometric characteristics of the (tube-wing) aircraft:
+      - fuselage size is computed from payload requirements
+      - wing dimensions are computed from global parameters (area, taper ratio...)
+      - tail planes are dimensioned from HQ requirements
+
+    The hypothesis done is a fixed rear_length that fixes fuselage length leading to tail-wing
+    distance changes when wing position change. This results in a mainly-linear behaviour on the
+    static margin derivative relative to wing position.
+    """
+
+    def initialize(self):
+        self.options.declare(CABIN_SIZING_OPTION, types=float, default=1.0)
+        self.options.declare("propulsion_id", default="", types=str)
+
+    def setup(self):
+        propulsion_option = {"propulsion_id": self.options["propulsion_id"]}
+        self.add_subsystem(
+            "compute_engine_nacelle_dimension",
+            oad.RegisterSubmodel.get_submodel(
+                SUBMODEL_NACELLE_DIMENSION, options=propulsion_option
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "compute_fuselage",
+            ComputeFuselageH2(
+                #cabin_sizing=self.options[CABIN_SIZING_OPTION],
+                #propulsion_id=self.options["propulsion_id"],
+            ),
+            promotes=["*"],
+        )
+        self.add_subsystem("compute_vt", ComputeVerticalTailGeometryFL(), promotes=["*"])
+        self.add_subsystem("compute_ht", ComputeHorizontalTailGeometryFL(), promotes=["*"])
+        self.add_subsystem(
+            "compute_wing",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_WING_GEOMETRY),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "compute_engine_nacelle_position",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_NACELLE_POSITION),
             promotes=["*"],
         )
