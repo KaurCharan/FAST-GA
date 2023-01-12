@@ -377,6 +377,7 @@ def _check_weight_performance_loop(problem):
         rtol=5e-2,
     )
 
+
 def test_oad_process_hybridelectric(cleanup):
     """Test the overall aircraft design process with wing positioning under VLM method."""
     logging.basicConfig(level=logging.WARNING)

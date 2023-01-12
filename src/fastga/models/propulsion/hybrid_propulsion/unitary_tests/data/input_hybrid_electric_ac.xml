@@ -1,6 +1,4 @@
 <FASTOAD_model>
-  <time_step units="s" is_inout="False">[150, 200, 300]</time_step>
-  <altitude_econ units="m" is_inout="False">[2000, 2010, 2020]</altitude_econ>
   <data>
     <TLAR>
       <NPAX_design is_input="True">4.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
@@ -203,6 +201,8 @@
           <CM is_input="True">-0.24648012559668536<!--additional pitching moment coefficient ue to the deployment of flaps in landing configuration--></CM>
         </landing>
         <takeoff>
+          <!--<power is_input="True">300comment for full oad process</power>-->
+          <!--<duration is_input="True">0.1comment for full oad process</duration>-->
           <CD is_input="True">0.0016913911094004637<!--additional drag coefficient due to flaps deployment in takeoff configuration--></CD>
           <CL is_input="True">0.5211347517730497<!--lift coefficient increment due to flaps deployment in takeoff configuration--></CL>
           <CL_max is_input="True">0.22<!--maximum lift coefficient increment due to flaps deployment in takeoff configuration--></CL_max>

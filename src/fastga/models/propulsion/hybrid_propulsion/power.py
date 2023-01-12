@@ -76,7 +76,7 @@ class ComputePower(om.ExplicitComponent):
 
         self.add_output(
             "mechanical_power",
-            val=np.nan,
+            val=np.full(250, 100),
             desc="mechanical power to be supplied by all motors",
         )
 
@@ -161,6 +161,5 @@ class ComputePower(om.ExplicitComponent):
         mechanical_power = (
                 thrust * true_airspeed / propeller_efficiency
         )
-        #mechanical_power = [100 for i in range(200)]
-        #print(mechanical_power)
+        # mechanical_power = [1000 for i in range(250)]   ## TO DO: comment when running full oad process
         outputs["mechanical_power"] = mechanical_power

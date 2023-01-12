@@ -3,7 +3,6 @@ from openmdao.core.group import Group
 import fastoad.api as oad
 from fastoad.module_management.constants import ModelDomain
 import openmdao.api as om
-import numpy as np
 
 from .constants import (
     SUBMODEL_MOTOR_MASS,
@@ -21,6 +20,8 @@ from .constants import (
 class PropulsionHybrid(om.Group):
 
     def setup(self):
+        # options_equilibrium = {"number_of_points": 248}    # TO DO: comment during full oad process
+
         self.add_subsystem(
             "power_computation",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_COMPUTE_POWER),
@@ -55,13 +56,13 @@ class PropulsionHybrid(om.Group):
             "fuelcell_parameter",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_FUELCELL_PARAMETERS),
             promotes=["*"]
-        )
+        )  # TO DO: remove "options" during full oad process
 
         self.add_subsystem(
             "battery_parameters",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_BATTERY_PARAMETERS),
             promotes=["*"]
-        )
+        )  # TO DO: remove "options" during full oad process
 
         self.add_subsystem(
             "summation_weights",

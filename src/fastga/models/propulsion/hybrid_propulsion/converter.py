@@ -9,7 +9,7 @@ from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_CONVER
                       "fastga.submodel.propulsion.hybrid_propulsion.converter.legacy")
 class ComputeConverterMass(om.ExplicitComponent):
     def setup(self):
-        self.add_input("mechanical_power")
+        self.add_input("mechanical_power", shape=250)
         self.add_input("data:mission:sizing:takeoff:power")
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("switch_efficiency", val=0.95)

@@ -34,9 +34,9 @@ class BatteryParameters(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("mechanical_power")
-        self.add_input("data:mission:sizing:takeoff:power", np.nan)  #### check
-        self.add_input("data:mission:sizing:takeoff:duration")
+        self.add_input("mechanical_power", shape=250)
+        self.add_input("data:mission:sizing:takeoff:power")  # TO DO: remove from input file during full oad process
+        self.add_input("data:mission:sizing:takeoff:duration")  # TO DO: remove from input file during full oad process
         self.add_input("fuelcell_Pelec_max")
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("battery_efficiency", val=0.95)
@@ -50,16 +50,10 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_input(
             "time_step",
             shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, np.nan),
+            val=np.full(number_of_points + 2, 0.1),
             units="s",
         )
 
-        self.add_output(
-            "soc",
-            val=np.full(number_of_points + 2, 0.0),
-            desc="soc at each time step",
-            units="percent",
-        )
         self.add_output(
             "n_parallel",
             shape=1,
@@ -73,7 +67,7 @@ class BatteryParameters(om.ExplicitComponent):
             desc="number of cells in series",
         )
         self.add_output(
-            "weight_BatteryPack",
+            "battery_weight",
             val=1925.00,
             units="kg",
             desc="mass of all battery packs",
@@ -93,10 +87,10 @@ class BatteryParameters(om.ExplicitComponent):
 
         self.add_output("data:geometry:propulsion:battery:volume", units="m**3", desc="volume of battery pack")
         self.add_output("data:geometry:propulsion:battery:weight", units="kg", desc="mass of battery pack")
-        self.add_output("data:propulsion:battery:soc")
+        self.add_output("data:propulsion:battery:soc", shape=100)
         self.add_output("data:geometry:propulsion:battery:n_parallel")
         self.add_output("data:geometry:propulsion:battery:n_series")
-        self.add_output("data:propulsion:battery:efficiency_out")
+        self.add_output("data:propulsion:battery:efficiency_out", shape=100)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
@@ -114,7 +108,7 @@ class BatteryParameters(om.ExplicitComponent):
 
         # append power and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
-        time_total = np.append(time_TO, time_step)
+        time_total = np.append(time_TO, time_step[0:99])
         battery_model = BatteryModel(electrical_power_total, time_total)
 
         # storing parameters

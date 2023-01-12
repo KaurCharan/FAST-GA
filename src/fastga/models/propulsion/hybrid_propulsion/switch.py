@@ -14,7 +14,7 @@ class ComputeSwitchMass(om.ExplicitComponent):
            Based on:
         """
     def setup(self):
-        self.add_input("mechanical_power")
+        self.add_input("mechanical_power", shape=250)
         self.add_input("data:mission:sizing:takeoff:power", np.nan)
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("switch_efficiency", val=0.95)

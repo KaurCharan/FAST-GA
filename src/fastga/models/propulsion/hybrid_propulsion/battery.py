@@ -13,8 +13,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Union, Sequence
-from scipy.interpolate import interp2d
 import numpy as np
 
 
@@ -49,7 +47,7 @@ class BatteryModel:
         cell_mass = 44.5 / 1000  # in [kg]
         C_max = 6  # per hour
 
-        Power = self.power_input / 1000  # input power profile [kWatt] ----------
+        Power = self.power_input  # input power profile [kWatt] ----------
         t_duration = self.time_input  # input time duration [seconds]
 
         ## initial voltage estimation of a battery module
@@ -71,13 +69,13 @@ class BatteryModel:
 
         n_series = vol_elecSys // V_nom + 1  # number of cells in series in a module
         if i == 0:
-            n_parallel = (Power[i] * 1000) // (Q_rat * vol_elecSys * C_max)  # initial estimate of modules in parallel
+            n_parallel = (Power[i]) // (Q_rat * vol_elecSys * C_max)  # initial estimate of modules in parallel
             print("initial value of n_parallel", n_parallel)
 
         while i < len(t_duration):
             print(i)
             Pb = 0
-            P_in[i] = Power[i] * 1000
+            P_in[i] = Power[i]
             t[i] = t_duration[i] / 60 / 60
             print("power input", P_in[i])
             Ib[i] = (P_in[i]) / (n_parallel * vol_elecSys)  # initial estimate of discharge current
@@ -149,6 +147,7 @@ class BatteryModel:
         """
         dia = 18.3  # mm
         length = 65  # mm
+
         # Compute battery pack volume
-        BatteryPack_volume = (np.pi() * (dia ** 2) / 4 / 0.785) * length * n_parallel * n_series / 0.6
+        BatteryPack_volume = (np.pi * (dia ** 2) / 4 / 0.785) * length * n_parallel * n_series / 0.6
         return BatteryPack_volume
