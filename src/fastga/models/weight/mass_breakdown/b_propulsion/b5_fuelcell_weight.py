@@ -1,0 +1,46 @@
+"""Computes the mass of fuel cell system"""
+#  This file is part of FAST-OAD_CS23 : A framework for rapid Overall Aircraft Design
+#  Copyright (C) 2022  ONERA & ISAE-SUPAERO
+#  FAST is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import numpy as np
+from scipy.constants import lbf
+from openmdao.core.explicitcomponent import ExplicitComponent
+
+# noinspection PyProtectedMember
+from fastoad.module_management._bundle_loader import BundleLoader
+import fastoad.api as oad
+from fastoad.constants import EngineSetting
+
+from .constants import SUBMODEL_FUELCELL_MASS
+
+oad.RegisterSubmodel.active_models[
+    SUBMODEL_FUELCELL_MASS
+] = "fastga.submodel.weight.mass.propulsion.fuelcell_mass"
+
+
+@oad.RegisterSubmodel(
+    SUBMODEL_FUELCELL_MASS, "fastga.submodel.weight.mass.propulsion.fuelcell_mass"
+)
+class ComputeFuelCellWeight(ExplicitComponent):
+
+    def setup(self):
+
+        self.add_input("data:geometry:propulsion:fuelcell:weight", val=np.nan, units="kg")
+
+        self.add_output("data:weight:propulsion:fuselage:fuelcell", units="kg")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        outputs["data:weight:propulsion:fuselage:fuelcell"] = (
+            inputs["data:geometry:propulsion:fuelcell:weight"]
+        )
