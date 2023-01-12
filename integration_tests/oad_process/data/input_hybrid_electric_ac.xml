@@ -47,6 +47,7 @@
         <maximum_height units="m" is_input="True">1.62<!--maximum fuselage height--></maximum_height>
         <maximum_width units="m" is_input="True">1.36<!--maximum fuselage width--></maximum_width>
         <rear_length units="m" is_input="True">3.74<!--length of the rear cone of the aircraft--></rear_length>
+        <number_of_inlets is_input="True">2.0<!--number of inlets needed for the fuel-cell--></number_of_inlets>
       </fuselage>
       <horizontal_tail>
         <aspect_ratio is_input="True">5.01<!--horizontal tail aspect ratio--></aspect_ratio>
