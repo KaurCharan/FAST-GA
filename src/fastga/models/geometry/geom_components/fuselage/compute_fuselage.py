@@ -20,6 +20,7 @@ from .components import (
     ComputeFuselageGeometryBasic,
     ComputeFuselageGeometryCabinSizingFD,
     ComputeFuselageGeometryCabinSizingFL,
+    ComputeFuselageGeometryCabinSizingH2,
 )
 
 from .constants import SUBMODEL_FUSELAGE_WET_AREA
@@ -60,6 +61,29 @@ class ComputeFuselageLegacy(Group):
             self.add_subsystem(
                 "compute_fuselage_dim",
                 ComputeFuselageGeometryCabinSizingFD(propulsion_id=self.options["propulsion_id"]),
+                promotes=["*"],
+            )
+        else:
+            self.add_subsystem(
+                "compute_fuselage_dim", ComputeFuselageGeometryBasic(), promotes=["*"]
+            )
+        self.add_subsystem(
+            "compute_fus_wet_area",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_FUSELAGE_WET_AREA),
+            promotes=["*"],
+        )
+
+
+class ComputeFuselageH2(Group):
+    def initialize(self):
+        self.options.declare(CABIN_SIZING_OPTION, types=float, default=1.0)
+        self.options.declare("propulsion_id", default="", types=str)
+
+    def setup(self):
+        if self.options[CABIN_SIZING_OPTION] == 1.0:
+            self.add_subsystem(
+                "compute_fuselage_dim",
+                ComputeFuselageGeometryCabinSizingH2(propulsion_id=self.options["propulsion_id"]),
                 promotes=["*"],
             )
         else:
