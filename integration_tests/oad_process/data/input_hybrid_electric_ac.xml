@@ -37,9 +37,6 @@
             <length units="m" is_input="True">1.0<!--pilot seats length--></length>
             <width units="m" is_input="True">1.0<!--pilot seats width--></width>
           </pilot>
-            <length units="m" is_input="True">1.0<!--pilot seats length--></length>
-            <width units="m" is_input="True">0.4</width>
-          </pilot>
         </seats>
       </cabin>
       <flap>
