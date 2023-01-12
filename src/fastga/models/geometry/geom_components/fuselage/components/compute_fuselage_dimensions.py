@@ -293,7 +293,6 @@ class ComputeFuselageGeometryCabinSizingH2(ExplicitComponent):
         self.add_input("data:geometry:fuselage:rear_length", units="m")
         self.add_input("data:geometry:propulsion:nacelle:length", val=np.nan, units="m")
         self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
-        self.add_input("data:mission:sizing:fuel", val=np.nan, units="kg") #additional code
         self.add_input("data:geometry:propulsion:hydrogen:weight", val=np.nan, units="kg") #additional code
         self.add_input("data:geometry:propulsion:hydrogen:volume(liquid)", val=np.nan, units=m**3) #additional code
         self.add_input("data:geometry:fuselage:number_of_tank", val=np.nan) #additional code
