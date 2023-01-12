@@ -54,3 +54,4 @@ model:
 submodels:
     submodel.geometry.vertical_tail.position.fd: null
     submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
+    submodel.geometry.wing.thickness_ratio: fastga.submodel.geometry.wing.thickness_ratio.electric
