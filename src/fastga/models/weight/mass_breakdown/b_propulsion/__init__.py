@@ -15,3 +15,5 @@ from .b1_2_oil_weight import ComputeOilWeight
 from .b1_engine_weight import ComputeEngineWeight, ComputeEngineWeightRaymer
 from .b2_fuel_lines_weight import ComputeFuelLinesWeight, ComputeFuelLinesWeightFLOPS
 from .b3_unusable_fuel_weight import ComputeUnusableFuelWeight
+from .b4_hydrogen_storage_weight import ComputeHydrogenStorageWeight #additional code
+from .b5_fuelcell_weight import ComputeFuelCellWeight #additional code
