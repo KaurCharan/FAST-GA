@@ -14,4 +14,6 @@
 from .b1_engine_cg import ComputeEngineCG
 from .b2_fuel_lines_cg import ComputeFuelLinesCG
 from .b3_tank_cg import ComputeTankCG
+from .b4_hydrogen_storage_cg import ComputeHydrogenStorageCG #additional code
+from .b5_fuelcell_cg import ComputeFuelCellCG #additional code
 from .b_cg import FuelPropulsionCG
