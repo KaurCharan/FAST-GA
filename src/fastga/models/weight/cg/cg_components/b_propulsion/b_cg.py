@@ -39,7 +39,7 @@ class ComputeFuelPropulsionCG(om.ExplicitComponent):
         self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
         self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
         self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan) #additional code
-        self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan) #additional code
+        # self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan) #additional code
 
         self.add_input("data:weight:propulsion:engine:mass", units="kg", val=np.nan)
         self.add_input("data:weight:propulsion:fuel_lines:mass", units="kg", val=np.nan)

@@ -36,14 +36,15 @@ class ComputePower(om.ExplicitComponent):
     def initialize(self):
 
         self.options.declare(
-            "number_of_points", default=1, desc="number of flight points"
+            "number_of_points", default=252, desc="number of flight points"
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
-        self.add_input("thrust", val=np.full(number_of_points, 0.0), units="N")
-        self.add_input("altitude", val=np.full(number_of_points, 0.0), units="m")
-        self.add_input("true_airspeed", val=np.full(number_of_points, 0.0), units="m/s")
+
+        self.add_input("thrust_econ", val=np.full(number_of_points, 0.0), units="N")
+        self.add_input("altitude_econ", val=np.full(number_of_points, 0.0), units="m")
+        self.add_input("true_airspeed_econ", val=np.full(number_of_points, 0.0), units="m/s")
         self.add_input("data:aerodynamics:propeller:cruise_level:altitude", units="m", val=np.nan)
         self.add_input("data:aerodynamics:propeller:sea_level:speed",
                        np.full(SPEED_PTS_NB, np.nan),
@@ -76,7 +77,7 @@ class ComputePower(om.ExplicitComponent):
 
         self.add_output(
             "mechanical_power",
-            val=np.full(250, 100),
+            val=np.full(number_of_points, 100),
             desc="mechanical power to be supplied by all motors",
         )
 
@@ -161,5 +162,5 @@ class ComputePower(om.ExplicitComponent):
         mechanical_power = (
                 thrust * true_airspeed / propeller_efficiency
         )
-        # mechanical_power = [1000 for i in range(250)]   ## TO DO: comment when running full oad process
+        # mechanical_power = [1000 for i in range(250)]   ## TODO: comment when running full oad process
         outputs["mechanical_power"] = mechanical_power

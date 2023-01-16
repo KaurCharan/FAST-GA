@@ -21,13 +21,13 @@ from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_FUELCE
 class FuelcellParameters(om.ExplicitComponent):
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points", default=252, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("mechanical_power", shape=number_of_points+2)
+        self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:duration")
         self.add_input("data:propulsion:fuelcell:current")  ##### check
         self.add_input("data:propulsion:voltage")  ####
@@ -64,7 +64,7 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_input("n", val=2.0)
         self.add_input("F", val=96485.0)
         self.add_input("R", val=0.0001)
-        self.add_input("alpha", val=0.195)
+        self.add_input("alpha_fuelcell", val=0.195)
         self.add_input("Io", val=0.46)
         self.add_input("I_leak", val=10)
         self.add_input("I_limit", val=380)
@@ -73,14 +73,14 @@ class FuelcellParameters(om.ExplicitComponent):
 
         self.add_input(
             "altitude_econ",
-            shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, 2000),
+            shape=number_of_points,
+            val=np.full(number_of_points, 2000),
             units="m",
         )
         self.add_input(
-            "time_step",
-            shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, 0.1),
+            "time_step_econ",
+            shape=number_of_points,
+            val=np.full(number_of_points, 0.1),
             units="s",
         )
 
@@ -96,9 +96,9 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:fuelcell:volume", shape=1)
         self.add_output("data:geometry:propulsion:hydrogen:weight", shape=1)
         self.add_output("data:geometry:propulsion:fuelcell:air_flow", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:volume(300bar)", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:volume(700bar)", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:volume(liquid)", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:volume_300bar", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:volume_700bar", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:volume_liquid", shape=1)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
@@ -131,7 +131,7 @@ class FuelcellParameters(om.ExplicitComponent):
         n = inputs["n"]
         F = inputs["F"]
         R = inputs["R"]
-        alpha = inputs["alpha"]
+        alpha_fuelcell = inputs["alpha_fuelcell"]
         Io = inputs["Io"]
         I_limit = inputs["I_limit"]
         I_leak = inputs["I_leak"]
@@ -164,7 +164,7 @@ class FuelcellParameters(om.ExplicitComponent):
         # Calculating cell voltage for a range of current
         for i in range(len(I)):
             V_act = Rgas * Top * (np.log(I[i] + I_leak) - np.log(Io)) / (
-                    alpha * n * F)
+                    alpha_fuelcell * n * F)
             V_ohm = I[i] * R
             V_conc = c * np.log(I_limit / (I_limit - I[i] - I_leak))
             delVp = 0.06 * np.log(P_oper / P_nom)
@@ -257,6 +257,6 @@ class FuelcellParameters(om.ExplicitComponent):
         outputs["data:geometry:propulsion:fuelcell:volume"] = float(FC_stack_volume)
         outputs["data:geometry:propulsion:hydrogen:weight"] = float(H2_mass)
         outputs["data:geometry:propulsion:fuelcell:air_flow"] = float(Air_flow)
-        outputs["data:geometry:propulsion:hydrogen:volume(300bar)"] = float(H2_volume_300bar)
-        outputs["data:geometry:propulsion:hydrogen:volume(700bar)"] = float(H2_volume_700bar)
-        outputs["data:geometry:propulsion:hydrogen:volume(liquid)"] = float(H2_volume_liq)
+        outputs["data:geometry:propulsion:hydrogen:volume_300bar"] = float(H2_volume_300bar)
+        outputs["data:geometry:propulsion:hydrogen:volume_700bar"] = float(H2_volume_700bar)
+        outputs["data:geometry:propulsion:hydrogen:volume_liquid"] = float(H2_volume_liq)

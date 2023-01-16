@@ -78,7 +78,7 @@ class DEPEquilibrium(om.Group):
                 promotes_outputs=["*"],
             )
             options_propulsion = {
-                "number_of_points": number_of_points,
+                "number_of_points": number_of_points + 2,
                 "propulsion_id": self.options["propulsion_id"],
             }
             self.add_subsystem(
@@ -124,7 +124,7 @@ class DEPEquilibrium(om.Group):
                     SUBMODEL_ENERGY_CONSUMPTION, options=options_propulsion
                 ),
                 promotes_inputs=["data:*"],
-                promotes_outputs=[],
+                promotes_outputs=["data:*"],
             )
 
             self.connect("compute_dep_effect.delta_Cl", "compute_equilibrium.delta_Cl")

@@ -28,15 +28,15 @@ class BatteryParameters(om.ExplicitComponent):
 
     def initialize(self):
         self.options.declare(
-            "number_of_points", default=1, desc="number of equilibrium to be treated"
+            "number_of_points", default=252, desc="number of equilibrium to be treated"
         )
 
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("mechanical_power", shape=250)
-        self.add_input("data:mission:sizing:takeoff:power")  # TO DO: remove from input file during full oad process
-        self.add_input("data:mission:sizing:takeoff:duration")  # TO DO: remove from input file during full oad process
+        self.add_input("mechanical_power", shape=number_of_points)
+        self.add_input("data:mission:sizing:takeoff:power")  # TODO: remove from input file(line 204) during full oad process
+        self.add_input("data:mission:sizing:takeoff:duration")  # TODO: remove from input file(line 205) during full oad process
         self.add_input("fuelcell_Pelec_max")
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("battery_efficiency", val=0.95)
@@ -48,9 +48,9 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_input("cables_efficiency", val=0.80)
 
         self.add_input(
-            "time_step",
-            shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, 0.1),
+            "time_step_econ",
+            shape=number_of_points,
+            val=np.full(number_of_points, 0.1),
             units="s",
         )
 
@@ -81,7 +81,7 @@ class BatteryParameters(om.ExplicitComponent):
 
         self.add_output(
             "battery_efficiency_out",
-            val=np.full(number_of_points + 2, 0.5),
+            val=np.full(number_of_points, 0.5),
             desc="efficiency of battery",
         )
 

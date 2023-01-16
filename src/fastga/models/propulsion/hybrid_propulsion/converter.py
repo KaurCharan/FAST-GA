@@ -8,8 +8,15 @@ from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_CONVER
 @oad.RegisterSubmodel(SUBMODEL_CONVERTER_MASS,
                       "fastga.submodel.propulsion.hybrid_propulsion.converter.legacy")
 class ComputeConverterMass(om.ExplicitComponent):
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=252, desc="number of equilibrium to be treated"
+        )
+
     def setup(self):
-        self.add_input("mechanical_power", shape=250)
+        number_of_points = self.options["number_of_points"]
+
+        self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power")
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("switch_efficiency", val=0.95)

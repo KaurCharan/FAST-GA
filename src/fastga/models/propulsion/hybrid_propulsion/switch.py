@@ -13,8 +13,15 @@ class ComputeSwitchMass(om.ExplicitComponent):
     """Estimation on switch mass [kg] based on maximum power required from motor
            Based on:
         """
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=252, desc="number of equilibrium to be treated"
+        )
+
     def setup(self):
-        self.add_input("mechanical_power", shape=250)
+        number_of_points = self.options["number_of_points"]
+
+        self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power", np.nan)
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("switch_efficiency", val=0.95)

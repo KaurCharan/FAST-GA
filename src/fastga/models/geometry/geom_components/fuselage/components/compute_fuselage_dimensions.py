@@ -294,10 +294,10 @@ class ComputeFuselageGeometryCabinSizingH2(ExplicitComponent):
         self.add_input("data:geometry:propulsion:nacelle:length", val=np.nan, units="m")
         self.add_input("data:geometry:propulsion:engine:layout", val=np.nan)
         self.add_input("data:geometry:propulsion:hydrogen:weight", val=np.nan, units="kg") #additional code
-        self.add_input("data:geometry:propulsion:hydrogen:volume(liquid)", val=np.nan, units=m**3) #additional code
+        self.add_input("data:geometry:propulsion:hydrogen:volume_liquid", val=np.nan, units="m**3") #additional code
         self.add_input("data:geometry:fuselage:number_of_tank", val=np.nan) #additional code
         self.add_input("data:geometry:propulsion:fuelcell:volume", val=np.nan) #additional code (1)
-        self.add_input("data:geometry:fuselage:nfuellcell", val=np.nan) #additional code
+        self.add_input("data:geometry:propulsion:fuelcell:stacks", val=np.nan) #additional code
 
         self.add_output("data:geometry:cabin:NPAX")
         self.add_output("data:geometry:fuselage:length", val=10.0, units="m")
@@ -334,10 +334,10 @@ class ComputeFuselageGeometryCabinSizingH2(ExplicitComponent):
         prop_layout = inputs["data:geometry:propulsion:engine:layout"]
         lar = inputs["data:geometry:fuselage:rear_length"]
         H2_mass = inputs["data:geometry:propulsion:hydrogen:weight"] #additional code
-        H2_volume = inputs["data:geometry:propulsion:hydrogen:volume(liquid)"] #additional code
+        H2_volume = inputs["data:geometry:propulsion:hydrogen:volume_liquid"] #additional code
         ntank = inputs["data:geometry:fuselage:number_of_tank"] #additional code
         fuelcell_volume = inputs["data:geometry:propulsion:fuelcell:volume"] #additional code
-        fuelcell_number = inputs["data:geometry:fuselage:nfuellcell"] #additional code
+        fuelcell_number = inputs["data:geometry:propulsion:fuelcell:stacks"] #additional code
 
         # Length of instrument panel
         l_instr = 0.7

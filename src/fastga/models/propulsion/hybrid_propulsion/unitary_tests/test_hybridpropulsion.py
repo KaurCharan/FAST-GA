@@ -13,9 +13,10 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 XML_FILE = "input_hybrid_electric_ac.xml"
 
+
 def test_hybrid_propulsion_group():
     # Research independent input value in .xml file
-    ivc = get_indep_var_comp(list_inputs(PropulsionHybrid()), __file__, XML_FILE)
+    ivc = get_indep_var_comp(list_inputs(PropulsionHybrid(number_of_points=252)), __file__, XML_FILE)
 
     # Run problem and check obtained value(s) is/(are) correct
     problem = run_system(PropulsionHybrid(), ivc)

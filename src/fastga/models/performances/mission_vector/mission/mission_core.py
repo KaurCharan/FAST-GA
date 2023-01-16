@@ -27,14 +27,12 @@ class MissionCore(om.Group):
     """Find the conditions necessary for the aircraft equilibrium."""
 
     def initialize(self):
-
         self.options.declare(
             "number_of_points", default=1, desc="number of equilibrium to be treated"
         )
         self.options.declare("propulsion_id", default=None, types=str, allow_none=True)
 
     def setup(self):
-
         number_of_points = self.options["number_of_points"]
 
         self.add_subsystem(
@@ -46,53 +44,30 @@ class MissionCore(om.Group):
             "compute_time_step",
             ComputeTimeStep(number_of_points=number_of_points),
             promotes_inputs=[],
-            promotes_outputs=[],
+            promotes_outputs=["time_step"],
         )
         options_equilibrium = {
             "number_of_points": number_of_points,
             "propulsion_id": self.options["propulsion_id"],
+            "promotes_all_variables": True
         }
         self.add_subsystem(
             "compute_dep_equilibrium",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_EQUILIBRIUM, options=options_equilibrium),
-            promotes_inputs=["data:*"],
-            promotes_outputs=[],
+            promotes=["*"]
         )
         self.add_subsystem(
             "performance_per_phase",
             PerformancePerPhase(number_of_points=number_of_points),
-            promotes_inputs=[],
-            promotes_outputs=["data:*"],
+            promotes_inputs=["fuel_consumed_t_econ", "position", "time", "non_consumable_energy_t_econ", "thrust_rate_t_econ"],
+            promotes_outputs=["data:*", "fuel_consumed_t", "non_consumable_energy_t", "thrust_rate_t"],
         )
         self.add_subsystem("reserve_fuel", ReserveEnergy(), promotes=["*"])
         self.add_subsystem("sizing_fuel", SizingEnergy(), promotes=["*"])
         self.add_subsystem(
             "update_mass",
             UpdateMass(number_of_points=number_of_points),
-            promotes_inputs=["data:*"],
-            promotes_outputs=[],
+            promotes_inputs=["data:*", "fuel_consumed_t"],
+            promotes_outputs=["mass"],
         )
 
-        self.connect(
-            "compute_dep_equilibrium.compute_energy_consumed.fuel_consumed_t_econ",
-            "performance_per_phase.fuel_consumed_t_econ",
-        )
-
-        self.connect(
-            "compute_dep_equilibrium.compute_energy_consumed.non_consumable_energy_t_econ",
-            "performance_per_phase.non_consumable_energy_t_econ",
-        )
-
-        self.connect(
-            "compute_dep_equilibrium.compute_energy_consumed.thrust_rate_t_econ",
-            "performance_per_phase.thrust_rate_t_econ",
-        )
-
-        self.connect("update_mass.mass", "compute_dep_equilibrium.compute_equilibrium.mass")
-
-        self.connect("performance_per_phase.fuel_consumed_t", "update_mass.fuel_consumed_t")
-
-        self.connect(
-            "compute_time_step.time_step",
-            "compute_dep_equilibrium.preparation_for_energy_consumption.time_step",
-        )

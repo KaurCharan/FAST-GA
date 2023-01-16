@@ -62,7 +62,7 @@ class Cd0Inlets(ExplicitComponent):
         cruise_alt = inputs["data:mission:sizing:main_route:cruise:altitude"]
         rho_cruise = Atmosphere(cruise_alt, altitude_in_feet=True).density
         v_cruise = inputs["data:TLAR:v_cruise"]
-        reynolds_number = inputs["data:geometry:wing:cruise:reynolds"]
+        reynolds_number = inputs["data:aerodynamics:wing:cruise:reynolds"]
         fuselage_length = inputs["data:geometry:fuselage:length"]
         fuelcell_airflow = inputs["data:geometry:propulsion:fuelcell:air_flow"]
         inlets = inputs["data:geometry:fuselage:number_of_inlets"]
