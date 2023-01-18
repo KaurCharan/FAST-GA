@@ -57,7 +57,7 @@ class ComputeCnBetaFuselage(ExplicitComponent):
         wing_area = inputs["data:geometry:wing:area"]
         span = inputs["data:geometry:wing:span"]
 
-        l_f = math.sqrt(width_max * height_max)
+        l_f = np.sqrt(width_max * height_max)
         l_cyc = fus_length - lav - lar
         # estimation of fuselage volume
         volume_fus = math.pi * l_f ** 2.0 / 4.0 * (0.7 * lav + 0.5 * lar + l_cyc)

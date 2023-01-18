@@ -138,7 +138,7 @@ class Compute2DHingeMomentsTail(FigureDigitization):
         # repartition for the hinge line) We will also assume that the thickness ratio of the
         # elevator is the same as the tail and that it has a round nose
 
-        balance_ratio = math.sqrt((1.0 / 3.0) ** 2.0 - (tail_thickness_ratio * 5.0 / 4) ** 2.0)
+        balance_ratio = np.sqrt((1.0 / 3.0) ** 2.0 - (tail_thickness_ratio * 5.0 / 4) ** 2.0)
 
         if balance_ratio < 0.15:
             balance_ratio = 0.15
@@ -154,7 +154,7 @@ class Compute2DHingeMomentsTail(FigureDigitization):
 
         sos_cruise = Atmosphere(cruise_alt, altitude_in_feet=False).speed_of_sound
         mach = v_cruise / sos_cruise
-        beta = math.sqrt(1.0 - mach ** 2.0)
+        beta = np.sqrt(1.0 - mach ** 2.0)
 
         ch_alpha_fin = ch_alpha_balance / beta
 

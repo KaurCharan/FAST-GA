@@ -297,13 +297,13 @@ class OPENVSPSimpleGeometry(ExternalCodeComp):
             cm_0_wing = float(data.loc["cm_0_wing", 0])
             y_vector_wing = np.array(
                 [float(i) for i in data.loc["y_vector_wing", 0][1:-2].split(",")]
-            ) * math.sqrt(s_ref_wing / saved_area_wing)
+            ) * np.sqrt(s_ref_wing / saved_area_wing)
             cl_vector_wing = np.array(
                 [float(i) for i in data.loc["cl_vector_wing", 0][1:-2].split(",")]
             )
             chord_vector_wing = np.array(
                 [float(i) for i in data.loc["chord_vector_wing", 0][1:-2].split(",")]
-            ) * math.sqrt(s_ref_wing / saved_area_wing)
+            ) * np.sqrt(s_ref_wing / saved_area_wing)
             coeff_k_wing = float(data.loc["coeff_k_wing", 0])
             cl_0_htp = float(data.loc["cl_0_htp", 0]) * (area_ratio / saved_area_ratio)
             cl_aoa_htp = float(data.loc["cl_X_htp", 0]) * (area_ratio / saved_area_ratio)

@@ -167,8 +167,8 @@ class HTPConstraints(om.ExplicitComponent):
 
         # Calculation of take-off minimum speed
         weight = mtow * g
-        vs0 = math.sqrt(weight / (0.5 * rho * wing_area * cl_max_takeoff))
-        vs1 = math.sqrt(weight / (0.5 * rho * wing_area * cl_max_clean))
+        vs0 = np.sqrt(weight / (0.5 * rho * wing_area * cl_max_takeoff))
+        vs1 = np.sqrt(weight / (0.5 * rho * wing_area * cl_max_clean))
         # Rotation speed requirement from FAR 23.51 (depends on number of engines)
         if n_engines == 1:
             v_r = vs1 * 1.0
@@ -250,7 +250,7 @@ class HTPConstraints(om.ExplicitComponent):
 
         # Calculation of take-off minimum speed
         weight = mlw * g
-        vs0 = math.sqrt(weight / (0.5 * rho * wing_area * cl_max_landing))
+        vs0 = np.sqrt(weight / (0.5 * rho * wing_area * cl_max_landing))
         # Rotation speed requirement from FAR 23.73
         v_r = vs0 * 1.3
         # Calculation of wheel factor
@@ -503,7 +503,7 @@ class _ComputeAeroCoeff(om.ExplicitComponent):
         if self.options["landing"]:
             # Calculation of take-off minimum speed
             weight = mlw * g
-            vs0 = math.sqrt(weight / (0.5 * rho * wing_area * cl_max_landing))
+            vs0 = np.sqrt(weight / (0.5 * rho * wing_area * cl_max_landing))
             # Rotation speed correction
             v_r = vs0 * 1.3
             # Evaluate aircraft overall angle (aoa)

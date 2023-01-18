@@ -105,7 +105,7 @@ class FuelcellParameters(om.ExplicitComponent):
                            * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \
                            inputs["cables_efficiency"]
 
-        time_step = inputs["time_step"]
+        time_step = inputs["time_step_econ"]
         FCeff = inputs["fuelcell_efficiency"]
         cell_current = inputs["data:propulsion:fuelcell:current"]
         V_max = inputs["data:propulsion:voltage"]

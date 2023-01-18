@@ -69,11 +69,11 @@ class ComputeClAlphaVT(FigureDigitization):
 
         if self.options["low_speed_aero"]:
             mach = inputs["data:aerodynamics:low_speed:mach"]
-            beta = math.sqrt(1 - mach ** 2)
+            beta = np.sqrt(1 - mach ** 2)
             k = inputs["data:aerodynamics:vertical_tail:airfoil:CL_alpha"] / (2.0 * np.pi)
         else:
             mach = inputs["data:aerodynamics:cruise:mach"]
-            beta = math.sqrt(1 - mach ** 2)
+            beta = np.sqrt(1 - mach ** 2)
             k = inputs["data:aerodynamics:vertical_tail:airfoil:CL_alpha"] / (beta * 2.0 * np.pi)
 
         tail_type = np.round(inputs["data:geometry:has_T_tail"])
@@ -116,7 +116,7 @@ class ComputeClAlphaVT(FigureDigitization):
             * lambda_vt
             / (
                 2
-                + math.sqrt(
+                + np.sqrt(
                     4
                     + lambda_vt ** 2
                     * beta ** 2

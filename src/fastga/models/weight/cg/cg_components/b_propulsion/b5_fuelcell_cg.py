@@ -36,4 +36,4 @@ class ComputeFuelCellCG(ExplicitComponent):
 
         cg_b5 = inputs["data:geometry:fuselage:length"] - 0.5*inputs["data:geometry:fuselage:tank_length"] - inputs["data:geometry:fuselage:rear_length"] - 0.5*inputs["data:geometry:fuselage:fuelcell:length"]
 
-        outputs["data:weight:propulsion:H2_storage:CG:x"] = cg_b5
+        outputs["data:weight:propulsion:fuelcell:CG:x"] = cg_b5

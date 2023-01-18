@@ -221,7 +221,7 @@ class ComputeBalkedLandingLimit(aircraft_equilibrium_limit):
 
         rho = Atmosphere(0.0).density
 
-        v_s0 = math.sqrt((mlw * 9.81) / (0.5 * rho * wing_area * cl_max_landing))
+        v_s0 = np.sqrt((mlw * 9.81) / (0.5 * rho * wing_area * cl_max_landing))
         v_ref = 1.3 * v_s0
 
         propulsion_model = self._engine_wrapper.get_model(inputs)

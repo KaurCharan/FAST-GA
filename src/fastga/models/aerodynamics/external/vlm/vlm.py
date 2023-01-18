@@ -227,7 +227,7 @@ class VLMSimpleGeometry(om.ExplicitComponent):
 
             # Post-process wing data ---------------------------------------------------------------
             k_fus = 1 + 0.025 * width_max / span_wing - 0.025 * (width_max / span_wing) ** 2
-            beta = math.sqrt(1 - mach ** 2)  # Prandtl-Glauert
+            beta = np.sqrt(1 - mach ** 2)  # Prandtl-Glauert
             cl_0_wing = float(wing_0["cl"] * k_fus / beta)
             cl_aoa_wing = float(wing_aoa["cl"] * k_fus / beta)
             cm_0_wing = float(wing_0["cm"] * k_fus / beta)
@@ -329,13 +329,13 @@ class VLMSimpleGeometry(om.ExplicitComponent):
             cm_0_wing = float(data.loc["cm_0_wing", 0])
             y_vector_wing = np.array(
                 [float(i) for i in data.loc["y_vector_wing", 0][1:-2].split(",")]
-            ) * math.sqrt(sref_wing / saved_area_wing)
+            ) * np.sqrt(sref_wing / saved_area_wing)
             cl_vector_wing = np.array(
                 [float(i) for i in data.loc["cl_vector_wing", 0][1:-2].split(",")]
             )
             chord_vector_wing = np.array(
                 [float(i) for i in data.loc["chord_vector_wing", 0][1:-2].split(",")]
-            ) * math.sqrt(sref_wing / saved_area_wing)
+            ) * np.sqrt(sref_wing / saved_area_wing)
             coef_k_wing = float(data.loc["coef_k_wing", 0])
             cl_0_htp = float(data.loc["cl_0_htp", 0]) * (area_ratio / saved_area_ratio)
             cl_aoa_htp = float(data.loc["cl_X_htp", 0]) * (area_ratio / saved_area_ratio)
@@ -580,7 +580,7 @@ class VLMSimpleGeometry(om.ExplicitComponent):
 
         # Calculate downwash angle based on Gudmundsson model (p.467)
         cl_wing = wing["cl"]
-        beta = math.sqrt(1 - mach ** 2)  # Prandtl-Glauert
+        beta = np.sqrt(1 - mach ** 2)  # Prandtl-Glauert
         downwash_angle = 2.0 * np.array(cl_wing) / beta * 180.0 / (aspect_ratio_wing * np.pi ** 2)
         aoa_angle_corrected = aoa_angle - downwash_angle
 
@@ -826,8 +826,8 @@ class VLMSimpleGeometry(om.ExplicitComponent):
                 coeff_2 = y_c[i] - y_1[j]
                 coeff_3 = x_c[i] - x_2[j]
                 coeff_4 = y_c[i] - y_2[j]
-                coeff_5 = math.sqrt(coeff_1 ** 2 + coeff_2 ** 2)
-                coeff_6 = math.sqrt(coeff_3 ** 2 + coeff_4 ** 2)
+                coeff_5 = np.sqrt(coeff_1 ** 2 + coeff_2 ** 2)
+                coeff_6 = np.sqrt(coeff_3 ** 2 + coeff_4 ** 2)
                 coeff_7 = x_2[j] - x_1[j]
                 coeff_8 = y_2[j] - y_1[j]
                 coeff_10 = (coeff_7 * coeff_1 + coeff_8 * coeff_2) / coeff_5 - (
@@ -846,8 +846,8 @@ class VLMSimpleGeometry(om.ExplicitComponent):
                 coeff_2 = y_c[i] - y_1[self.n_x * self.n_y + j]
                 coeff_3 = x_c[i] - x_2[self.n_x * self.n_y + j]
                 coeff_4 = y_c[i] - y_2[self.n_x * self.n_y + j]
-                coeff_5 = math.sqrt(coeff_1 ** 2 + coeff_2 ** 2)
-                coeff_6 = math.sqrt(coeff_3 ** 2 + coeff_4 ** 2)
+                coeff_5 = np.sqrt(coeff_1 ** 2 + coeff_2 ** 2)
+                coeff_6 = np.sqrt(coeff_3 ** 2 + coeff_4 ** 2)
                 coeff_7 = x_2[self.n_x * self.n_y + j] - x_1[self.n_x * self.n_y + j]
                 coeff_8 = y_2[self.n_x * self.n_y + j] - y_1[self.n_x * self.n_y + j]
                 coeff_9 = (coeff_7 * coeff_1 + coeff_8 * coeff_2) / coeff_5 - (

@@ -73,7 +73,7 @@ class ComputeWingY(ExplicitComponent):
         wing_break = inputs["data:geometry:wing:kink:span_ratio"]
         width_max = inputs["data:geometry:fuselage:maximum_width"]
 
-        span = math.sqrt(lambda_wing * wing_area)
+        span = np.sqrt(lambda_wing * wing_area)
 
         # Wing geometry
         y4_wing = span / 2.0

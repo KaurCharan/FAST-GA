@@ -47,7 +47,6 @@ class Cd0Inlets(ExplicitComponent):
             self.add_output("data:aerodynamics:inlets:low_speed:CD0")
         else:
             self.add_output("data:aerodynamics:inlets:cruise:CD0")
-
             self.add_output("data:geometry:inlets:width", units="ft")
             self.add_output("data:geometry:inlets:throat:length", units="ft")
             self.add_output("data:geometry:inlets:throat:width", units="ft")
@@ -117,17 +116,23 @@ class Cd0Inlets(ExplicitComponent):
         total_drag = ram_drag + spillage_drag + incremental_drag
         inlet_drag = total_drag * inlets
 
-        outputs["data:geometry:inlets:width"] = inlet_width
-        outputs["data:geometry:inlets:maximum_height"] = max_external_height
-        outputs["data:geometry:inlets:lip_height"] = lip_height
-        outputs["data:geometry:inlets:area"] = inlet_area
-        outputs["data:geometry:inlets:throat:length"] = throat_length
-        outputs["data:geometry:inlets:throat:width"] = throat_thickness
+        # outputs["data:geometry:inlets:width"] = inlet_width
+        # outputs["data:geometry:inlets:maximum_height"] = max_external_height
+        # outputs["data:geometry:inlets:lip_height"] = lip_height
+        # outputs["data:geometry:inlets:area"] = inlet_area
+        # outputs["data:geometry:inlets:throat:length"] = throat_length
+        # outputs["data:geometry:inlets:throat:width"] = throat_thickness
 
         if self.options["low_speed_aero"]:
             outputs["data:aerodynamics:inlets:low_speed:CD0"] = inlet_drag
         else:
             outputs["data:aerodynamics:inlets:cruise:CD0"] = inlet_drag
+            outputs["data:geometry:inlets:width"] = inlet_width
+            outputs["data:geometry:inlets:maximum_height"] = max_external_height
+            outputs["data:geometry:inlets:lip_height"] = lip_height
+            outputs["data:geometry:inlets:area"] = inlet_area
+            outputs["data:geometry:inlets:throat:length"] = throat_length
+            outputs["data:geometry:inlets:throat:width"] = throat_thickness
 
 
 

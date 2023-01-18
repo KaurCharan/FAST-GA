@@ -1638,7 +1638,7 @@ class BasicTPEngine(AbstractFuelPropulsion):
         cf_nac = 0.455 / (
             (1 + 0.144 * mach ** 2) ** 0.65 * (math.log10(reynolds)) ** 2.58
         )  # 100% turbulent
-        fineness = self.nacelle.length / math.sqrt(
+        fineness = self.nacelle.length / np.sqrt(
             4 * self.nacelle.height * self.nacelle.width / math.pi
         )
         ff_nac = 1 + 0.35 / fineness  # Raymer (seen in Gudmunsson)

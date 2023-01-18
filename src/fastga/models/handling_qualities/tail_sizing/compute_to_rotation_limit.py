@@ -170,7 +170,7 @@ class ComputeTORotationLimit(om.ExplicitComponent):
 
         # Calculation of take-off minimum speed
         weight = mtow * g
-        vs1 = math.sqrt(weight / (0.5 * rho * wing_area * cl_max_takeoff))
+        vs1 = np.sqrt(weight / (0.5 * rho * wing_area * cl_max_takeoff))
 
         if n_engines == 1.0:
             vr = 1.10 * vs1

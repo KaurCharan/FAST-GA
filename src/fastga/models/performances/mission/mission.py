@@ -127,8 +127,8 @@ class UpdateFW(om.ExplicitComponent):
     def setup(self):
 
         self.add_input("data:mission:sizing:taxi_out:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:takeoff:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:initial_climb:fuel", np.nan, units="kg")
+        self.add_input("data:mission:sizing:takeoff:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:initial_climb:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:main_route:climb:fuel", np.nan, units="kg")
         self.add_input("data:mission:sizing:main_route:cruise:fuel", np.nan, units="kg")
         self.add_input("data:mission:sizing:main_route:reserve:fuel", np.nan, units="kg")

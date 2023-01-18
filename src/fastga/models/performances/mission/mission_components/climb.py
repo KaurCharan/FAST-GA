@@ -72,8 +72,8 @@ class ComputeClimb(DynamicEquilibrium):
         self.add_input("data:aerodynamics:horizontal_tail:cruise:induced_drag_coefficient", np.nan)
         self.add_input("data:weight:aircraft:MTOW", np.nan, units="kg")
         self.add_input("data:mission:sizing:taxi_out:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:takeoff:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:initial_climb:fuel", np.nan, units="kg")
+        self.add_input("data:mission:sizing:takeoff:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:initial_climb:fuel", val=0, units="kg")
         self.add_input(
             "data:mission:sizing:main_route:climb:climb_rate:sea_level", val=np.nan, units="m/s"
         )
@@ -242,8 +242,8 @@ class ComputeClimbSpeed(om.ExplicitComponent):
         self.add_input("data:weight:aircraft:MTOW", np.nan, units="kg")
 
         self.add_input("data:mission:sizing:taxi_out:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:takeoff:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:initial_climb:fuel", np.nan, units="kg")
+        self.add_input("data:mission:sizing:takeoff:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:initial_climb:fuel", val=0, units="kg")
 
         self.add_output("data:mission:sizing:main_route:climb:v_cas", units="m/s")
 

@@ -400,7 +400,7 @@ class ComputeDeltaHighLift(FigureDigitization):
         if flap_type == 1:  # Slotted flap
             alpha_flap = self.k_prime_single_slotted(angle, flap_chord_ratio)
             delta_cl_airfoil = (
-                2 * math.pi / math.sqrt(1 - mach ** 2) * alpha_flap * (angle * math.pi / 180)
+                2 * math.pi / np.sqrt(1 - mach ** 2) * alpha_flap * (angle * math.pi / 180)
             )
         else:  # Plain flap
             cl_delta_theory = self.cl_delta_theory_plain_flap(

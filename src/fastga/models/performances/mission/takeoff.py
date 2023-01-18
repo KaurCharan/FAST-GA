@@ -175,7 +175,7 @@ class _v2(om.ExplicitComponent):
         # Define Cl considering 30% margin and estimate alpha
         while True:
             cl = cl_max_takeoff / factor ** 2.0
-            v2 = math.sqrt((2.0 * mtow * g) / (cl * atm.density * wing_area))
+            v2 = np.sqrt((2.0 * mtow * g) / (cl * atm.density * wing_area))
             mach = v2 / atm.speed_of_sound
 
             flight_point = oad.FlightPoint(
@@ -291,7 +291,7 @@ class _v_lift_off_from_v2(om.ExplicitComponent):
             cl = cl0 + cl_alpha * alpha[i]
             # Loop on estimated lift-off speed error induced by thrust estimation
             rel_error = 0.1
-            v_lift_off[i] = math.sqrt((mtow * g) / (0.5 * atm_0.density * wing_area * cl))
+            v_lift_off[i] = np.sqrt((mtow * g) / (0.5 * atm_0.density * wing_area * cl))
             while rel_error > 0.05:
                 # Update thrust with v_lift_off
                 flight_point = oad.FlightPoint(
@@ -306,7 +306,7 @@ class _v_lift_off_from_v2(om.ExplicitComponent):
                 if thrust * math.sin(alpha[i]) > mtow * g:
                     break
                 else:
-                    v = math.sqrt(
+                    v = np.sqrt(
                         (mtow * g - thrust * math.sin(alpha[i]))
                         / (0.5 * atm_0.density * wing_area * cl)
                     )
@@ -344,7 +344,7 @@ class _v_lift_off_from_v2(om.ExplicitComponent):
                 acc_z = (lift + thrust * math.sin(alpha_t) - weight * math.cos(gamma_t)) / mtow
                 # Calculate gamma change and new speed
                 delta_gamma = math.atan((acc_z * TIME_STEP) / (v_t + acc_x * TIME_STEP))
-                v_t_new = math.sqrt((acc_z * TIME_STEP) ** 2 + (v_t + acc_x * TIME_STEP) ** 2)
+                v_t_new = np.sqrt((acc_z * TIME_STEP) ** 2 + (v_t + acc_x * TIME_STEP) ** 2)
                 # Trapezoidal integration on distance/altitude
                 delta_altitude = (
                     (v_t_new * math.sin(gamma_t + delta_gamma) + v_t * math.sin(gamma_t))
@@ -553,7 +553,7 @@ class _simulate_takeoff(om.ExplicitComponent):
             )
 
         # Determine rotation speed from regulation CS23.51
-        vs1 = math.sqrt((mtow * g) / (0.5 * Atmosphere(0).density * wing_area * cl_max_clean))
+        vs1 = np.sqrt((mtow * g) / (0.5 * Atmosphere(0).density * wing_area * cl_max_clean))
         if inputs["data:geometry:propulsion:engine:count"] == 1.0:
             k = 1.0
         else:
@@ -604,7 +604,7 @@ class _simulate_takeoff(om.ExplicitComponent):
                 acc_x = (thrust * math.cos(alpha_t) - drag - friction) / mtow
             # Calculate gamma change and new speed
             delta_gamma = math.atan((acc_z * TIME_STEP) / (v_t + acc_x * TIME_STEP))
-            v_t_new = math.sqrt((acc_z * TIME_STEP) ** 2 + (v_t + acc_x * TIME_STEP) ** 2)
+            v_t_new = np.sqrt((acc_z * TIME_STEP) ** 2 + (v_t + acc_x * TIME_STEP) ** 2)
             # Trapezoidal integration on distance/altitude
             delta_altitude = (
                 (v_t_new * math.sin(gamma_t + delta_gamma) + v_t * math.sin(gamma_t))
@@ -632,6 +632,8 @@ class _simulate_takeoff(om.ExplicitComponent):
             v_t = v_t_new
 
         climb_gradient = thrust / (mtow * g) - cd / cl
+        mass_fuel2_t = 0
+        mass_fuel1_t = 0
 
         outputs["data:mission:sizing:takeoff:VR"] = vr
         outputs["data:mission:sizing:takeoff:VLOF"] = v_lift_off

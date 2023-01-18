@@ -31,9 +31,9 @@ class FullMission(om.Group):
 
     def setup(self):
 
-        self.add_subsystem(
-            "takeoff", TakeOffPhase(propulsion_id=self.options["propulsion_id"]), promotes=["*"]
-        )
+        # self.add_subsystem(
+        #     "takeoff", TakeOffPhase(propulsion_id=self.options["propulsion_id"]), promotes=["*"]
+        # )
         self.add_subsystem(
             "solve_equilibrium",
             MissionVector(

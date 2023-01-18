@@ -91,9 +91,9 @@ class ComputePower(om.ExplicitComponent):
         """
         # Include advance ratio loss in here, we will assume that since we work at constant RPM
         # the change in advance ration is equal to a change in
-        thrust = inputs["thrust"]
-        altitude = inputs["altitude"]
-        true_airspeed = inputs["true_airspeed"]
+        thrust = inputs["thrust_econ"]
+        altitude = inputs["altitude_econ"]
+        true_airspeed = inputs["true_airspeed_econ"]
         cruise_altitude_propeller = inputs["data:aerodynamics:propeller:cruise_level:altitude"]
         speed_SL = inputs["data:aerodynamics:propeller:sea_level:speed"]
         thrust_SL = inputs["data:aerodynamics:propeller:sea_level:thrust"]
@@ -144,8 +144,8 @@ class ComputePower(om.ExplicitComponent):
                 np.interp(list(installed_airspeed), speed_CL, thrust_limit_CL),
             )
 
-        lower_bound = float(propeller_efficiency_SL(thrust_interp_SL, installed_airspeed))
-        upper_bound = float(propeller_efficiency_CL(thrust_interp_CL, installed_airspeed))
+        lower_bound = propeller_efficiency_SL(thrust_interp_SL, installed_airspeed)
+        upper_bound = propeller_efficiency_CL(thrust_interp_CL, installed_airspeed)
         propeller_efficiency = np.interp(
             altitude, [0, cruise_altitude_propeller], [lower_bound, upper_bound]
         )

@@ -50,7 +50,7 @@ class ComputeLDMax(ExplicitComponent):
         cd0 = inputs["data:aerodynamics:aircraft:cruise:CD0"]
         coeff_k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
 
-        cl_opt = math.sqrt(cd0 / coeff_k)
+        cl_opt = np.sqrt(cd0 / coeff_k)
         alpha_opt = (cl_opt - cl0_clean) / cl_alpha * 180 / math.pi
         cd_opt = cd0 + coeff_k * cl_opt ** 2
 

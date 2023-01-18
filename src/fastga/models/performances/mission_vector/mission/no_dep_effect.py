@@ -137,7 +137,7 @@ class NoDEPEffect(om.ExplicitComponent):
         t_c = ((dep_to_thrust_ratio * thrust_loading) /
                (N * density * velocity ** 2 * dp2_w))
 
-        a_p = 0.5 * (np.sqrt(1 + (8 * t_c) / math.pi) - 1)
+        a_p = 0.5 * (np.sqrt(1 + (8 * t_c) / np.pi) - 1)
 
         rp_c = 0.5 * np.sqrt(dp2_w * wing_loading * aspect_ratio)
         xp_rp = propeller_distance_ratio / rp_c
@@ -146,14 +146,14 @@ class NoDEPEffect(om.ExplicitComponent):
 
         a_w = ((a_p + 1) / rw_rp ** 2) - 1
 
-        alpha_w = ((cl / 2 * math.pi * aspect_ratio)
-                   * (2 + math.sqrt(aspect_ratio ** 2 * (1 - mach**2) + 4)))
+        alpha_w = ((cl / 2 * np.pi * aspect_ratio)
+                   * (2 + np.sqrt(aspect_ratio ** 2 * (1 - mach**2) + 4)))
 
-        delta_Cl = dep_to_span_ratio * 2 * math.pi * ((math.sin(alpha_w) - a_w * sideslip_correction_factor
-                                                       * math.sin(propeller_wing_angle))
-                                                      * math.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
-                                                                  sideslip_correction_factor * math.cos(alpha_w) + 1)
-                                                      - math.sin(alpha_w))
+        delta_Cl = dep_to_span_ratio * 2 * np.pi * ((np.sin(alpha_w) - a_w * sideslip_correction_factor
+                                                       * np.sin(propeller_wing_angle))
+                                                      * np.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
+                                                                  sideslip_correction_factor * np.cos(alpha_w) + 1)
+                                                      - np.sin(alpha_w))
 
         delta_cd0 = dep_to_span_ratio * a_w ** 2 * skin_friction_coefficient
 

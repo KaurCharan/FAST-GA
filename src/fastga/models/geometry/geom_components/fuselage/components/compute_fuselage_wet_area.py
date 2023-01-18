@@ -59,7 +59,7 @@ class ComputeFuselageWetArea(ExplicitComponent):
         lar = inputs["data:geometry:fuselage:rear_length"]
 
         # Using the simple geometric description
-        fus_dia = math.sqrt(b_f * h_f)  # equivalent diameter of the fuselage
+        fus_dia = np.sqrt(b_f * h_f)  # equivalent diameter of the fuselage
         cyl_length = fus_length - lav - lar
         wet_area_nose = 2.45 * fus_dia * lav
         wet_area_cyl = math.pi * fus_dia * cyl_length
@@ -101,7 +101,7 @@ class ComputeFuselageWetAreaFLOPS(ExplicitComponent):
         fus_length = inputs["data:geometry:fuselage:length"]
 
         # Using the formula from The Flight Optimization System Weights Estimation Method
-        fus_dia = math.sqrt(b_f * h_f)  # equivalent diameter of the fuselage
+        fus_dia = np.sqrt(b_f * h_f)  # equivalent diameter of the fuselage
         wet_area_fus = math.pi * (fus_length / fus_dia - 1.7) * fus_dia ** 2.0
 
         master_cross_section = math.pi * (fus_dia / 2.0) ** 2.0

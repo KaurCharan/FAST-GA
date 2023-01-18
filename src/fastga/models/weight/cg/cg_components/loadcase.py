@@ -240,7 +240,7 @@ class ComputeFlightCGCase(ExplicitComponent):
         # noinspection PyTypeChecker
         mtow = inputs["data:weight:aircraft:MTOW"]
 
-        vh = self.max_speed(inputs, 0.0, mtow)
+        vh = 100  # [m/s]
 
         atm = Atmosphere(0.0, altitude_in_feet=False)
         flight_point = oad.FlightPoint(
@@ -251,7 +251,7 @@ class ComputeFlightCGCase(ExplicitComponent):
         )
 
         propulsion_model.compute_flight_points(flight_point)
-        m_fuel = propulsion_model.get_consumed_mass(flight_point, 30.0 * 60.0)
+        m_fuel = 20    # [kg]
         # Fuel necessary for a half-hour at max continuous power
 
         return m_fuel

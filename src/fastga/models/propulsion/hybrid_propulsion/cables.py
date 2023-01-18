@@ -40,7 +40,7 @@ class ComputeCableMass(om.ExplicitComponent):
     #
     #     CabArea_Al = 0.0298 * (I ^ 1.46349) * 1e-6  # [m^2]
     #     CabArea_Cu = 0.0144 * (I ^ 1.4642) * 1e-6  # [m^2]
-    #     Cab_radius = math.sqrt(CabArea_Al / math.pi)  # [m]
+    #     Cab_radius = np.sqrt(CabArea_Al / math.pi)  # [m]
     #     Cab_circumference = 2 * math.pi * Cab_radius  # [m]
     #
     #     Cab_Length_specific_mass_Al = rho_Al * CabArea_Al  # [kg/m]
