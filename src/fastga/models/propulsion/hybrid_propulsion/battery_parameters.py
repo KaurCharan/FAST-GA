@@ -35,8 +35,8 @@ class BatteryParameters(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("mechanical_power", shape=number_of_points)
-        self.add_input("data:mission:sizing:takeoff:power")  # TODO: remove from input file(line 204) during full oad process
-        self.add_input("data:mission:sizing:takeoff:duration")  # TODO: remove from input file(line 205) during full oad process
+        self.add_input("data:mission:sizing:takeoff:power")
+        self.add_input("data:mission:sizing:takeoff:duration")
         self.add_input("fuelcell_Pelec_max")
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("battery_efficiency", val=0.95)
@@ -102,8 +102,13 @@ class BatteryParameters(om.ExplicitComponent):
         time_TO = np.array(inputs["data:mission:sizing:takeoff:duration"])
         mechanical_power = inputs["mechanical_power"]
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])
-
-        electrical_power = (mechanical_power[0:99] / total_efficiency) - fuelcell_Pelec_max
+        mechanical_power_climb = mechanical_power[0:99]
+        electrical_power = list(range(len(mechanical_power_climb)))
+        for idx in range(np.size(mechanical_power_climb)):
+            if mechanical_power_climb[idx] > fuelcell_Pelec_max:
+                electrical_power[idx] = abs((mechanical_power_climb[idx] / total_efficiency) - fuelcell_Pelec_max)
+            else:
+                electrical_power[idx] = 0
         electrical_power_TO = (mechanical_power_TO / total_efficiency) - fuelcell_Pelec_max
 
         # append power and time together

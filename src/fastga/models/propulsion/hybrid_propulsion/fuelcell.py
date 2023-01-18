@@ -8,7 +8,6 @@ Created on Tue Oct 18 15:18:28 2022
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-import math
 
 import fastoad.api as oad
 import openmdao.api as om

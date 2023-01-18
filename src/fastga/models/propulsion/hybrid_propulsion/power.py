@@ -151,8 +151,8 @@ class ComputePower(om.ExplicitComponent):
                 altitude, [0, cruise_altitude_propeller], [lower_bound, upper_bound]
             )
         else:  # calculate for array
+            propeller_efficiency = np.zeros(np.size(thrust))
             for idx in range(np.size(thrust)):
-                propeller_efficiency = np.zeros(np.size(thrust))
                 lower_bound = propeller_efficiency_SL(
                     thrust_interp_SL[idx], installed_airspeed[idx]
                 )
