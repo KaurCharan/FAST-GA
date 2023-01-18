@@ -47,7 +47,7 @@ class BatteryModel:
         cell_mass = 44.5 / 1000  # in [kg]
         C_max = 6  # per hour
 
-        Power = self.power_input  # input power profile [kWatt] ----------
+        Power = self.power_input  # input power profile [Watt] ----------
         t_duration = self.time_input  # input time duration [seconds]
 
         ## initial voltage estimation of a battery module

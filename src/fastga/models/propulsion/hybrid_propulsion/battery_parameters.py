@@ -98,7 +98,7 @@ class BatteryParameters(om.ExplicitComponent):
                            inputs["cables_efficiency"] * inputs["battery_efficiency"]
 
         fuelcell_Pelec_max = inputs["fuelcell_Pelec_max"]
-        time_step = inputs["time_step"]
+        time_step = inputs["time_step_econ"]
         time_TO = np.array(inputs["data:mission:sizing:takeoff:duration"])
         mechanical_power = inputs["mechanical_power"]
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])

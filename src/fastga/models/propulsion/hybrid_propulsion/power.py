@@ -144,11 +144,27 @@ class ComputePower(om.ExplicitComponent):
                 np.interp(list(installed_airspeed), speed_CL, thrust_limit_CL),
             )
 
-        lower_bound = propeller_efficiency_SL(thrust_interp_SL, installed_airspeed)
-        upper_bound = propeller_efficiency_CL(thrust_interp_CL, installed_airspeed)
-        propeller_efficiency = np.interp(
-            altitude, [0, cruise_altitude_propeller], [lower_bound, upper_bound]
-        )
+        if np.size(thrust) == 1:  # calculate for float
+            lower_bound = float(propeller_efficiency_SL(thrust_interp_SL, installed_airspeed))
+            upper_bound = float(propeller_efficiency_CL(thrust_interp_CL, installed_airspeed))
+            propeller_efficiency = np.interp(
+                altitude, [0, cruise_altitude_propeller], [lower_bound, upper_bound]
+            )
+        else:  # calculate for array
+            for idx in range(np.size(thrust)):
+                propeller_efficiency = np.zeros(np.size(thrust))
+                lower_bound = propeller_efficiency_SL(
+                    thrust_interp_SL[idx], installed_airspeed[idx]
+                )
+                upper_bound = propeller_efficiency_CL(
+                    thrust_interp_CL[idx], installed_airspeed[idx]
+                )
+                propeller_efficiency[idx] = (
+                        lower_bound
+                        + (upper_bound - lower_bound)
+                        * np.minimum(altitude[idx], cruise_altitude_propeller)
+                        / cruise_altitude_propeller
+                )
 
         """
         Computation of maximum thrust either due to propeller thrust limit or ICE max power.

@@ -195,9 +195,9 @@ class FuelcellParameters(om.ExplicitComponent):
 
         # Cruise
         Cruise_Imax = Cruise_Pelec_max / V_max
-        Cruise_stacks_parallel = math.ceil(Cruise_Imax / cell_current)
-        Cruise_cells_in_series = math.ceil(V_max / cell_voltage)
-        Cruise_stacks_series = math.ceil(Cruise_cells_in_series / cells_in_1stack)
+        Cruise_stacks_parallel = np.ceil(Cruise_Imax / cell_current)
+        Cruise_cells_in_series = np.ceil(V_max / cell_voltage)
+        Cruise_stacks_series = np.ceil(Cruise_cells_in_series / cells_in_1stack)
         Cruise_stacks = Cruise_stacks_parallel * Cruise_stacks_series
         Cruise_stack_mass = Cruise_stacks * single_stack_mass
 
@@ -236,9 +236,9 @@ class FuelcellParameters(om.ExplicitComponent):
         # print('Minimum H2 tank volume is of: ', min(data1, key=data1.get))
         #
         # # Length of hydrogen tank for 300 bar, 700 bar and liquid form [m]
-        # H2tank_length_300bar = H2tank_volume_300bar / (math.pi * (fus_dia / 2) ** 2)
-        # H2tank_length_700bar = H2tank_volume_700bar / (math.pi * (fus_dia / 2) ** 2)
-        # H2tank_length_liq = H2tank_volume_liq / (math.pi * (fus_dia / 2) ** 2)
+        # H2tank_length_300bar = H2tank_volume_300bar / (np.pi * (fus_dia / 2) ** 2)
+        # H2tank_length_700bar = H2tank_volume_700bar / (np.pi * (fus_dia / 2) ** 2)
+        # H2tank_length_liq = H2tank_volume_liq / (np.pi * (fus_dia / 2) ** 2)
         # data2 = {'H2tank_length_300bar': H2tank_length_300bar, 'H2tank_length_700bar': \
         #     H2tank_length_700bar, 'H2tank_length_liq': H2tank_length_liq}
         # print('Minimum H2 tank length is of: ', min(data2, key=data2.get))
