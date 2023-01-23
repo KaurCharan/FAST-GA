@@ -123,13 +123,13 @@ class NoDEPEffect(om.ExplicitComponent):
         wing_loading = MTOW / wing_area
         thrust_loading = thrust / MTOW
 
-        dep_to_span_ratio = diameter * N / wing_span
-        engine_spacing = 1  # assumption / can also be used as user input
+        engine_spacing = 0.5 * diameter  # assumption / can also be used as user input
+        dep_to_span_ratio = ((N/2 * diameter + (N/2 - 1) * engine_spacing) / 0.5 * wing_span)
         dep_to_thrust_ratio = 1  # since all the thrust comes from DEP
         propeller_distance_ratio = 0.25  # assuming the propeller is 0.25c ahead of wing
         propeller_wing_angle = 0  # assuming engine is parallel to wing -> alpha_w = alpha_p
         sideslip_correction_factor = 1  # assumption
-        skin_friction_coefficient = 0.009
+        skin_friction_coefficient = 0.
 
         dp2_w = ((dep_to_span_ratio ** 2 * aspect_ratio) /
                  (N ** 2 * (1 + engine_spacing) ** 2 * wing_loading))
@@ -147,13 +147,13 @@ class NoDEPEffect(om.ExplicitComponent):
         a_w = ((a_p + 1) / rw_rp ** 2) - 1
 
         alpha_w = ((cl / 2 * np.pi * aspect_ratio)
-                   * (2 + np.sqrt(aspect_ratio ** 2 * (1 - mach**2) + 4)))
+                   * (2 + np.sqrt(aspect_ratio ** 2 * (1 - mach ** 2) + 4)))
 
         delta_Cl = dep_to_span_ratio * 2 * np.pi * ((np.sin(alpha_w) - a_w * sideslip_correction_factor
-                                                       * np.sin(propeller_wing_angle))
-                                                      * np.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
-                                                                  sideslip_correction_factor * np.cos(alpha_w) + 1)
-                                                      - np.sin(alpha_w))
+                                                     * np.sin(propeller_wing_angle))
+                                                    * np.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
+                                                              sideslip_correction_factor * np.cos(alpha_w) + 1)
+                                                    - np.sin(alpha_w))
 
         delta_cd0 = dep_to_span_ratio * a_w ** 2 * skin_friction_coefficient
 
