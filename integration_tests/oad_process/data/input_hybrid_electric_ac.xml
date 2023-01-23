@@ -127,7 +127,7 @@
       </wing>
     </geometry>
     <propulsion>
-      <system_voltage is_input="True">8<!--number of motors considered in architecture--></system_voltage>
+      <system_voltage is_input="True">500<!--design system voltage--></system_voltage>
       <motor>
         <number is_input="True">8<!--number of motors considered in architecture--></number>
         <efficiency is_input="True">0.85<!-- desired efficiency of motor--></efficiency>

@@ -26,7 +26,7 @@ class ComputeMotorMass(om.ExplicitComponent):
         self.add_input("data:propulsion:motor:number", val=8, desc="number of motors")  #### check input
         self.add_output(
             "motor_weight",
-            val=np.nan,
+            val=0.0,
             units="kg",
             desc="motor mass of all motors",
         )

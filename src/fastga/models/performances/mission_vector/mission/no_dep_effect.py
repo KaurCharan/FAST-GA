@@ -12,7 +12,6 @@
 #  GNU General Public License for more details.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import math
 
 import numpy as np
 import openmdao.api as om
@@ -93,7 +92,7 @@ class NoDEPEffect(om.ExplicitComponent):
         self.add_input("true_airspeed", val=np.full(number_of_points, np.nan), units="m/s")
 
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
-        self.add_input("thrust", val=np.full(number_of_points, np.nan), units="N")
+        self.add_input("thrust", val=np.full(number_of_points, 0.0), units="N")
 
         self.add_output("delta_Cl", val=np.full(number_of_points, 0.0))
         self.add_output("delta_Cd", val=np.full(number_of_points, 0.0))
@@ -147,13 +146,13 @@ class NoDEPEffect(om.ExplicitComponent):
         a_w = ((a_p + 1) / rw_rp ** 2) - 1
 
         alpha_w = ((cl / 2 * np.pi * aspect_ratio)
-                   * (2 + np.sqrt(aspect_ratio ** 2 * (1 - mach**2) + 4)))
+                   * (2 + np.sqrt(aspect_ratio ** 2 * (1 - mach ** 2) + 4)))
 
         delta_Cl = dep_to_span_ratio * 2 * np.pi * ((np.sin(alpha_w) - a_w * sideslip_correction_factor
-                                                       * np.sin(propeller_wing_angle))
-                                                      * np.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
-                                                                  sideslip_correction_factor * np.cos(alpha_w) + 1)
-                                                      - np.sin(alpha_w))
+                                                     * np.sin(propeller_wing_angle))
+                                                    * np.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
+                                                              sideslip_correction_factor * np.cos(alpha_w) + 1)
+                                                    - np.sin(alpha_w))
 
         delta_cd0 = dep_to_span_ratio * a_w ** 2 * skin_friction_coefficient
 

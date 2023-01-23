@@ -65,12 +65,12 @@ class ComputeCruise(DynamicEquilibrium):
         self.add_input("data:mission:sizing:taxi_out:fuel", np.nan, units="kg")
         self.add_input("data:mission:sizing:takeoff:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:initial_climb:fuel", val=0, units="kg")
-        self.add_input("data:mission:sizing:main_route:climb:fuel", np.nan, units="kg")
+        self.add_input("data:mission:sizing:main_route:climb:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:main_route:climb:distance", np.nan, units="m")
         self.add_input("data:mission:sizing:main_route:descent:distance", np.nan, units="m")
         self.add_input("data:mission:sizing:main_route:climb:duration", np.nan, units="s")
 
-        self.add_output("data:mission:sizing:main_route:cruise:fuel", units="kg")
+        self.add_output("data:mission:sizing:main_route:cruise:fuel", val=0, units="kg")
         self.add_output("data:mission:sizing:main_route:cruise:distance", units="m")
         self.add_output("data:mission:sizing:main_route:cruise:duration", units="s")
 

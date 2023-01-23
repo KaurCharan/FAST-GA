@@ -82,7 +82,7 @@ class ComputeDescent(DynamicEquilibrium):
         self.add_input("data:mission:sizing:main_route:cruise:duration", np.nan, units="s")
         self.add_input("data:mission:sizing:main_route:descent:v_cas", np.nan, units="m/s")
 
-        self.add_output("data:mission:sizing:main_route:descent:fuel", units="kg")
+        self.add_output("data:mission:sizing:main_route:descent:fuel", val=0, units="kg")
         self.add_output("data:mission:sizing:main_route:descent:distance", 0.0, units="m")
         self.add_output("data:mission:sizing:main_route:descent:duration", units="s")
 

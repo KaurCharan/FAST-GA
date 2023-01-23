@@ -76,8 +76,17 @@ class BatteryModel:
             print(i)
             Pb = 0
             P_in[i] = Power[i]
-            t[i] = t_duration[i] / 60 / 60
+            t[i] = t_duration[i] / 60 / 60    # [h]
             print("power input", P_in[i])
+            # if P_in[i] == 0:
+            #     Ib[i] = 0
+            #     Q_used[i] = 0
+            #     Vc[i] = 0
+            #     soc[i] = 0
+            #     C = 0
+            #     i = i+1
+            #     continue
+            # else:
             Ib[i] = (P_in[i]) / (n_parallel * vol_elecSys)  # initial estimate of discharge current
             print("Ib is", Ib[i])
             while abs(Pb - P_in[i]) > 10 ** -5:
@@ -116,7 +125,7 @@ class BatteryModel:
                     break
 
             del_V[i] = 4.2 - Vc[i]
-            Q_used[i] = Ib[i] * t[i] + Q_used[i - 1]
+            Q_used[i] = Ib[i] * t[i]  # + Q_used[i - 1]  # [Wh]
             # Q_remain = Q_rat - Q_used[i]
             C_rate[i] = C  # discharge rate
             print("soc is", soc[i - 1])
@@ -128,7 +137,7 @@ class BatteryModel:
 
         # n = Q_remain / Q_rat
         weight = n_parallel * n_series * cell_mass
-        return weight, n_series, n_parallel, soc, eff_bat, C_rate
+        return weight, n_series, n_parallel, soc, eff_bat, C_rate, Q_used
 
     def compute_weight(self, weight_cells):
         """

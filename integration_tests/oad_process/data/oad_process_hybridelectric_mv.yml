@@ -1,0 +1,24 @@
+title: Sample OAD Process applied to GYPAETUS hybrid-electric
+
+# List of folder paths where user added custom registered OpenMDAO components
+module_folders:
+
+
+# Input and output files
+input_file: ../results/oad_process_inputs.xml
+output_file: ../results/oad_process_outputs.xml
+
+# Definition of problem driver assuming the OpenMDAO convention "import openmdao.api as om"
+driver: om.ScipyOptimizeDriver(tol=1e-2, optimizer='COBYLA')
+
+model:
+        performance:
+            id: fastga.performances.mission_vector
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+            out_file: D:/tmp/hybridelectric.csv
+
+submodels:
+    submodel.geometry.vertical_tail.position.fd: null
+    submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
+    submodel.geometry.wing.thickness_ratio: fastga.submodel.geometry.wing.thickness_ratio.electric
+    submodel.performances.energy_consumption: fastga.propulsion.hybrid_propulsion
