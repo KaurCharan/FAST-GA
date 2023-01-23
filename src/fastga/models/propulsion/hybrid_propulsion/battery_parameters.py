@@ -104,9 +104,10 @@ class BatteryParameters(om.ExplicitComponent):
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])
         mechanical_power_climb = mechanical_power[0:99]
         electrical_power = list(range(len(mechanical_power_climb)))
-        for idx in range(np.size(mechanical_power_climb)):
-            if mechanical_power_climb[idx] > fuelcell_Pelec_max:
-                electrical_power[idx] = abs((mechanical_power_climb[idx] / total_efficiency) - fuelcell_Pelec_max)
+        electrical_power_climb = mechanical_power_climb / total_efficiency
+        for idx in range(np.size(electrical_power_climb)):
+            if electrical_power_climb[idx] > fuelcell_Pelec_max:
+                electrical_power[idx] = abs(electrical_power_climb[idx] - fuelcell_Pelec_max)
             else:
                 electrical_power[idx] = 0
         electrical_power_TO = (mechanical_power_TO / total_efficiency) - fuelcell_Pelec_max

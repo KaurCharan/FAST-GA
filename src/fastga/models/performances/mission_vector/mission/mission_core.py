@@ -43,7 +43,7 @@ class MissionCore(om.Group):
         self.add_subsystem(
             "compute_time_step",
             ComputeTimeStep(number_of_points=number_of_points),
-            promotes_inputs=[],
+            promotes_inputs=["time"],
             promotes_outputs=["time_step"],
         )
         options_equilibrium = {
