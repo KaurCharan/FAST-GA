@@ -122,13 +122,13 @@ class NoDEPEffect(om.ExplicitComponent):
         wing_loading = MTOW / wing_area
         thrust_loading = thrust / MTOW
 
-        dep_to_span_ratio = diameter * N / wing_span
-        engine_spacing = 1  # assumption / can also be used as user input
+        engine_spacing = 0.5 * diameter  # assumption / can also be used as user input
+        dep_to_span_ratio = ((N/2 * diameter + (N/2 - 1) * engine_spacing) / 0.5 * wing_span)
         dep_to_thrust_ratio = 1  # since all the thrust comes from DEP
-        propeller_distance_ratio = 0.25  # assuming the propeller is 0.25c ahead of wing
+        propeller_distance_ratio = 0.2  # assuming the propeller is 0.2c ahead of wing (xp/c)
         propeller_wing_angle = 0  # assuming engine is parallel to wing -> alpha_w = alpha_p
         sideslip_correction_factor = 1  # assumption
-        skin_friction_coefficient = 0.009
+        skin_friction_coefficient = 0.
 
         dp2_w = ((dep_to_span_ratio ** 2 * aspect_ratio) /
                  (N ** 2 * (1 + engine_spacing) ** 2 * wing_loading))
