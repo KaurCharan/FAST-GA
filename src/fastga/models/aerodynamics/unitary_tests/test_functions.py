@@ -35,6 +35,7 @@ from fastga.models.aerodynamics.components import (
     ComputeLDMax,
     ComputeDeltaHighLift,
     ComputeDeltaElevator,
+    Cd0Inlets,
     Compute2DHingeMomentsTail,
     Compute3DHingeMomentsTail,
     ComputeHingeMomentsTail,
@@ -1353,3 +1354,12 @@ def equilibrated_cl_cd_polar(
     polar_cl = np.array(problem.get_val("data:aerodynamics:aircraft:cruise:equilibrated:CL"))
     valid_polar_cl = polar_cl[np.where(polar_cl < FIRST_INVALID_COEFF)[0]]
     assert list(valid_polar_cl)[::10] == pytest.approx(cl_polar_cruise_, abs=1e-2)
+
+
+def cd_inlets(XML_FILE: str):
+
+    ivc = get_indep_var_comp(list_inputs(Cd0Inlets()), __file__, XML_FILE)
+
+    problem = run_system(Cd0Inlets(), ivc)
+
+    inlet_drag = problem.get_val("data:aerodynamics:inlets:low_speed:CD0")
