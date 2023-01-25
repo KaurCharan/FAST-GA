@@ -105,13 +105,15 @@ class BatteryParameters(om.ExplicitComponent):
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])
         mechanical_power_climb = mechanical_power[0:100]
         electrical_power = list(range(len(mechanical_power_climb)))
+        electrical_power_TO = 0
         electrical_power_climb = mechanical_power_climb / total_efficiency
         for idx in range(np.size(electrical_power_climb)):
             if electrical_power_climb[idx] > fuelcell_Pelec_max:
-                electrical_power[idx] = abs(electrical_power_climb[idx] - fuelcell_Pelec_max)
+                electrical_power[idx] = float(abs(electrical_power_climb[idx] - fuelcell_Pelec_max))
             else:
                 electrical_power[idx] = 0
-        electrical_power_TO = (mechanical_power_TO / total_efficiency) - fuelcell_Pelec_max
+        if (mechanical_power_TO / total_efficiency/ 0.70) > fuelcell_Pelec_max:
+            electrical_power_TO = float((mechanical_power_TO / total_efficiency / 0.70) - fuelcell_Pelec_max)
 
         # append power and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
@@ -123,8 +125,8 @@ class BatteryParameters(om.ExplicitComponent):
         weight_BatteryPack = battery_model.compute_weight(weight_cells)
         volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
         extra = [0.0 for i in range(152)]
-        #energy_consumed = np.concatenate((Q_used[1:101], extra))
-        energy_consumed = Q_used[1:101] + extra
+        energy_consumed = np.concatenate((Q_used[1:101], extra))
+        #energy_consumed = Q_used[1:101] + extra
 
         outputs["non_consumable_energy_t_econ"] = energy_consumed
         outputs["data:propulsion:battery:soc"] = soc

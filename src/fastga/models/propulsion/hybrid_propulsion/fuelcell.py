@@ -140,7 +140,7 @@ class FuelcellParameters(om.ExplicitComponent):
 
         mechanical_power = inputs["mechanical_power"]
         # power and time for cruise and climb
-        electrical_power_cruise_max = max(mechanical_power[100:200]) / total_efficiency
+        electrical_power_cruise_max = max(mechanical_power[100:200] / total_efficiency)
         electrical_power_cruise = mechanical_power[100:200] / total_efficiency
         Cruise_Pelec_max = electrical_power_cruise_max
         Climb_Pelec = electrical_power_cruise_max
