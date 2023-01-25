@@ -126,14 +126,14 @@ class Mission(om.Group):
 class UpdateFW(om.ExplicitComponent):
     def setup(self):
 
-        self.add_input("data:mission:sizing:taxi_out:fuel", np.nan, units="kg")
+        self.add_input("data:mission:sizing:taxi_out:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:takeoff:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:initial_climb:fuel", val=0, units="kg")
-        self.add_input("data:mission:sizing:main_route:climb:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:main_route:cruise:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:main_route:reserve:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:main_route:descent:fuel", np.nan, units="kg")
-        self.add_input("data:mission:sizing:taxi_in:fuel", np.nan, units="kg")
+        self.add_input("data:mission:sizing:main_route:climb:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:main_route:cruise:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:main_route:reserve:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:main_route:descent:fuel", val=0, units="kg")
+        self.add_input("data:mission:sizing:taxi_in:fuel", val=0, units="kg")
 
         self.add_output("data:mission:sizing:fuel", val=0.0, units="kg")
 

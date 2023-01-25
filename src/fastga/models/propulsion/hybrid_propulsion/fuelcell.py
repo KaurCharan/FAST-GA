@@ -91,6 +91,7 @@ class FuelcellParameters(om.ExplicitComponent):
         )
 
         self.add_output("fuelcell_Pelec_max", shape=1)
+        self.add_output("fuel_consumed_t_econ", val=0, shape=number_of_points)
         self.add_output("data:geometry:propulsion:fuelcell:weight", shape=1)
         self.add_output("data:geometry:propulsion:fuelcell:volume", shape=1)
         self.add_output("data:geometry:propulsion:hydrogen:weight", shape=1)
@@ -139,22 +140,24 @@ class FuelcellParameters(om.ExplicitComponent):
 
         mechanical_power = inputs["mechanical_power"]
         # power and time for cruise and climb
-        electrical_power_cruise_max = max(mechanical_power[100:199]) / total_efficiency
-        electrical_power_cruise = mechanical_power[100:199] / total_efficiency
+        electrical_power_cruise_max = max(mechanical_power[100:200] / total_efficiency)
+        electrical_power_cruise = mechanical_power[100:200] / total_efficiency
         Cruise_Pelec_max = electrical_power_cruise_max
         Climb_Pelec = electrical_power_cruise_max
         TO_Pelec = electrical_power_cruise_max
         Cruise_Pelec = electrical_power_cruise
-        Cruise_time = time_step[100:199]
-        Climb_time = time_step[0:99]
+        Cruise_time = time_step[100:200]
+        Climb_time = time_step[0:100]
 
         # time for TO
         TO_time = inputs["data:mission:sizing:takeoff:duration"]
 
         # power and time for descent
-        electrical_power_descent = mechanical_power[200:249] / total_efficiency
+        electrical_power_descent = mechanical_power[200:250] / total_efficiency
         Descent_Pelec = electrical_power_descent
-        Descent_time = time_step[200:249]
+        Taxi_Pelec = mechanical_power[250:252] / total_efficiency
+        Descent_time = time_step[200:250]
+        Taxi_time = time_step[250:252]
 
         # fus_dia = inputs["data:geometry:fuselage:length"]
         I = list(range(0, 210, 10))  # Current [A]
@@ -206,8 +209,11 @@ class FuelcellParameters(om.ExplicitComponent):
 
         # Descent
         Descent_Pelec_inFC = Descent_Pelec / FCeff
+        Taxi_Pelec_inFC = Taxi_Pelec / FCeff
         Descent_H2_mass = (1.05 * 1e-8 * Descent_Pelec_inFC / (mu_H2 * cell_voltage)) * Descent_time
+        Taxi_H2_mass = (1.05 * 1e-8 * Taxi_Pelec_inFC / (mu_H2 * cell_voltage)) * Taxi_time
         Descent_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Descent_Pelec_inFC
+        Taxi_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Taxi_Pelec_inFC
 
         # FC stack mass
         FC_stack_mass = Cruise_stack_mass
@@ -216,10 +222,11 @@ class FuelcellParameters(om.ExplicitComponent):
         FC_stack_volume = Cruise_stacks * single_stack_volume
 
         # H2 mass
-        H2_mass = sum(TO_H2_mass) + sum(Climb_H2_mass) + sum(Cruise_H2_mass) + sum(Descent_H2_mass)
-
+        H2_mass = sum(TO_H2_mass) + sum(Climb_H2_mass) + sum(Cruise_H2_mass) + sum(Descent_H2_mass) + sum(Taxi_H2_mass)
+        H2_mass_array = np.concatenate((Climb_H2_mass, Cruise_H2_mass, Descent_H2_mass, Taxi_H2_mass))
         # Air mass
-        Air_flow = max(sum(TO_air_massflow), sum(Climb_air_massflow), sum(Cruise_air_massflow), sum(Descent_air_massflow))
+        Air_flow = max(sum(TO_air_massflow), sum(Climb_air_massflow), sum(Cruise_air_massflow),
+                       sum(Descent_air_massflow), sum(Taxi_air_massflow))
 
         # Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
         H2_volume_300bar = H2_mass * margin / H2_density_300bar
@@ -252,6 +259,7 @@ class FuelcellParameters(om.ExplicitComponent):
 
         outputs["fuelcell_Pelec_max"] = float(Cruise_Pelec_max)
         outputs["fuelcell_weight"] = float(FC_stack_mass)
+        outputs["fuel_consumed_t_econ"] = H2_mass_array
         outputs["data:geometry:propulsion:fuelcell:weight"] = float(FC_stack_mass)
         outputs["data:geometry:propulsion:fuelcell:volume"] = float(FC_stack_volume)
         outputs["data:geometry:propulsion:hydrogen:weight"] = float(H2_mass)

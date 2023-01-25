@@ -30,7 +30,7 @@ class ComputeConverterMass(om.ExplicitComponent):
 
         self.add_output(
             "converter_weight",
-            val=np.nan,
+            val=0.0,
             units="kg",
             desc="motor mass of all motors",
         )

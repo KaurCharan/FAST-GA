@@ -46,44 +46,44 @@ class PerformancePerPhase(om.ExplicitComponent):
         self.add_input(
             "fuel_consumed_t_econ",
             shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, np.nan),
+            val=np.full(number_of_points + 2, 0.0),
             units="kg",
         )
         self.add_input(
             "non_consumable_energy_t_econ",
             shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, np.nan),
+            val=np.full(number_of_points + 2, 0.0),
             units="W*h",
         )
         self.add_input(
             "thrust_rate_t_econ",
             shape=number_of_points + 2,
-            val=np.full(number_of_points + 2, np.nan),
+            val=np.full(number_of_points + 2, 0.0),
         )
 
-        self.add_output("data:mission:sizing:main_route:climb:fuel", units="kg")
-        self.add_output("data:mission:sizing:main_route:climb:energy", units="W*h")
+        self.add_output("data:mission:sizing:main_route:climb:fuel", val=0, units="kg")
+        self.add_output("data:mission:sizing:main_route:climb:energy", val=0, units="W*h")
         self.add_output("data:mission:sizing:main_route:climb:distance", units="m")
         self.add_output("data:mission:sizing:main_route:climb:duration", units="s")
 
-        self.add_output("data:mission:sizing:main_route:cruise:fuel", units="kg")
-        self.add_output("data:mission:sizing:main_route:cruise:energy", units="W*h")
+        self.add_output("data:mission:sizing:main_route:cruise:fuel", val=0, units="kg")
+        self.add_output("data:mission:sizing:main_route:cruise:energy", val=0,units="W*h")
         self.add_output("data:mission:sizing:main_route:cruise:distance", units="m")
         self.add_output("data:mission:sizing:main_route:cruise:duration", units="s")
 
-        self.add_output("data:mission:sizing:main_route:descent:fuel", units="kg")
-        self.add_output("data:mission:sizing:main_route:descent:energy", units="W*h")
+        self.add_output("data:mission:sizing:main_route:descent:fuel", val=0, units="kg")
+        self.add_output("data:mission:sizing:main_route:descent:energy", val=0, units="W*h")
         self.add_output("data:mission:sizing:main_route:descent:distance", units="m")
         self.add_output("data:mission:sizing:main_route:descent:duration", units="s")
 
-        self.add_output("data:mission:sizing:taxi_out:fuel", units="kg")
-        self.add_output("data:mission:sizing:taxi_out:energy", units="W*h")
-        self.add_output("data:mission:sizing:taxi_in:fuel", units="kg")
-        self.add_output("data:mission:sizing:taxi_in:energy", units="W*h")
+        self.add_output("data:mission:sizing:taxi_out:fuel", val=0, units="kg")
+        self.add_output("data:mission:sizing:taxi_out:energy", val=0, units="W*h")
+        self.add_output("data:mission:sizing:taxi_in:fuel", val=0, units="kg")
+        self.add_output("data:mission:sizing:taxi_in:energy", val=0, units="W*h")
 
-        self.add_output("fuel_consumed_t", shape=number_of_points, units="kg")
-        self.add_output("non_consumable_energy_t", shape=number_of_points, units="W*h")
-        self.add_output("thrust_rate_t", shape=number_of_points)
+        self.add_output("fuel_consumed_t", val=0, shape=number_of_points, units="kg")
+        self.add_output("non_consumable_energy_t", val=0.0, shape=number_of_points, units="W*h")
+        self.add_output("thrust_rate_t", val=0.0, shape=number_of_points)
 
     def setup_partials(self):
 

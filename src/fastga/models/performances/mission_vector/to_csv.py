@@ -123,7 +123,7 @@ class ToCSV(om.ExplicitComponent):
             "thrust", val=np.full(number_of_points, np.nan), shape=number_of_points, units="N"
         )
         self.add_input(
-            "thrust_rate_t", val=np.full(number_of_points, np.nan), shape=number_of_points
+            "thrust_rate_t", val=np.full(number_of_points, 0.0), shape=number_of_points
         )
         self.add_input("engine_setting", val=np.full(number_of_points, np.nan))
         self.add_input(

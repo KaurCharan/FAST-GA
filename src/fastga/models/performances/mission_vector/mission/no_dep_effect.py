@@ -12,7 +12,6 @@
 #  GNU General Public License for more details.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-import math
 
 import numpy as np
 import openmdao.api as om
@@ -93,7 +92,7 @@ class NoDEPEffect(om.ExplicitComponent):
         self.add_input("true_airspeed", val=np.full(number_of_points, np.nan), units="m/s")
 
         self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
-        self.add_input("thrust", val=np.full(number_of_points, np.nan), units="N")
+        self.add_input("thrust", val=np.full(number_of_points, 0.0), units="N")
 
         self.add_output("delta_Cl", val=np.full(number_of_points, 0.0))
         self.add_output("delta_Cd", val=np.full(number_of_points, 0.0))

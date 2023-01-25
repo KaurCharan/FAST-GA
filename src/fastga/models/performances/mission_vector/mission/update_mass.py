@@ -35,7 +35,7 @@ class UpdateMass(om.ExplicitComponent):
             val=np.full(number_of_points, np.nan),
             units="kg",
         )
-        self.add_input("data:mission:sizing:taxi_out:fuel", val=np.nan, units="kg")
+        self.add_input("data:mission:sizing:taxi_out:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:initial_climb:fuel", val=0, units="kg")
         self.add_input("data:mission:sizing:takeoff:fuel", val=0, units="kg")
 

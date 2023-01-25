@@ -399,6 +399,8 @@ def test_oad_process_hybridelectric(cleanup):
     problem.run_model()
     problem.write_outputs()
 
+    _, _, residuals = problem.model.get_nonlinear_vectors()
+    test = 1
     if not pth.exists(RESULTS_FOLDER_PATH):
         os.mkdir(RESULTS_FOLDER_PATH)
     om.view_connections(

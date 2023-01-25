@@ -52,12 +52,12 @@ class ComputeTaxi(om.ExplicitComponent):
             self.add_input("data:mission:sizing:taxi_out:thrust_rate", np.nan)
             self.add_input("data:mission:sizing:taxi_out:duration", np.nan, units="s")
             self.add_input("data:mission:sizing:taxi_out:speed", np.nan, units="m/s")
-            self.add_output("data:mission:sizing:taxi_out:fuel", units="kg")
+            self.add_output("data:mission:sizing:taxi_out:fuel", 0.0, units="kg")
         else:
             self.add_input("data:mission:sizing:taxi_in:thrust_rate", np.nan)
             self.add_input("data:mission:sizing:taxi_in:duration", np.nan, units="s")
             self.add_input("data:mission:sizing:taxi_in:speed", np.nan, units="m/s")
-            self.add_output("data:mission:sizing:taxi_in:fuel", units="kg")
+            self.add_output("data:mission:sizing:taxi_in:fuel", 0.0, units="kg")
 
         self.declare_partials("*", "*", method="fd")
 

@@ -68,29 +68,30 @@ class BatteryParameters(om.ExplicitComponent):
         )
         self.add_output(
             "battery_weight",
-            val=1925.00,
+            val=1375.00,
             units="kg",
             desc="mass of all battery packs",
         )
         self.add_output(
             "volume_BatteryPack",
-            val=2000.00,
+            val=2.00,
             units="m**3",
             desc="volume of all battery packs",
         )
 
         self.add_output(
             "battery_efficiency_out",
-            val=np.full(number_of_points, 0.5),
+            val=np.full(101, 0.5),
             desc="efficiency of battery",
         )
 
+        self.add_output("non_consumable_energy_t_econ", val=0, shape=number_of_points, units="W*h")
         self.add_output("data:geometry:propulsion:battery:volume", units="m**3", desc="volume of battery pack")
         self.add_output("data:geometry:propulsion:battery:weight", units="kg", desc="mass of battery pack")
-        self.add_output("data:propulsion:battery:soc", shape=100)
+        self.add_output("data:propulsion:battery:soc", val=0, shape=101)
         self.add_output("data:geometry:propulsion:battery:n_parallel")
         self.add_output("data:geometry:propulsion:battery:n_series")
-        self.add_output("data:propulsion:battery:efficiency_out", shape=100)
+        self.add_output("data:propulsion:battery:efficiency_out", val=0, shape=101)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
@@ -102,26 +103,32 @@ class BatteryParameters(om.ExplicitComponent):
         time_TO = np.array(inputs["data:mission:sizing:takeoff:duration"])
         mechanical_power = inputs["mechanical_power"]
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])
-        mechanical_power_climb = mechanical_power[0:99]
+        mechanical_power_climb = mechanical_power[0:100]
         electrical_power = list(range(len(mechanical_power_climb)))
+        electrical_power_TO = 0
         electrical_power_climb = mechanical_power_climb / total_efficiency
         for idx in range(np.size(electrical_power_climb)):
             if electrical_power_climb[idx] > fuelcell_Pelec_max:
-                electrical_power[idx] = abs(electrical_power_climb[idx] - fuelcell_Pelec_max)
+                electrical_power[idx] = float(abs(electrical_power_climb[idx] - fuelcell_Pelec_max))
             else:
                 electrical_power[idx] = 0
-        electrical_power_TO = (mechanical_power_TO / total_efficiency) - fuelcell_Pelec_max
+        if (mechanical_power_TO / total_efficiency/ 0.70) > fuelcell_Pelec_max:
+            electrical_power_TO = float((mechanical_power_TO / total_efficiency / 0.70) - fuelcell_Pelec_max)
 
         # append power and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
-        time_total = np.append(time_TO, time_step[0:99])
+        time_total = np.append(time_TO, time_step[0:100])
         battery_model = BatteryModel(electrical_power_total, time_total)
 
         # storing parameters
-        weight_cells, n_series, n_parallel, soc, eff_bat, C_rate = battery_model.compute_soc()
+        weight_cells, n_series, n_parallel, soc, eff_bat, C_rate, Q_used = battery_model.compute_soc()
         weight_BatteryPack = battery_model.compute_weight(weight_cells)
         volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
+        extra = [0.0 for i in range(152)]
+        energy_consumed = np.concatenate((Q_used[1:101], extra))
+        #energy_consumed = Q_used[1:101] + extra
 
+        outputs["non_consumable_energy_t_econ"] = energy_consumed
         outputs["data:propulsion:battery:soc"] = soc
         outputs["data:geometry:propulsion:battery:n_parallel"] = n_parallel
         outputs["data:geometry:propulsion:battery:n_series"] = n_series
