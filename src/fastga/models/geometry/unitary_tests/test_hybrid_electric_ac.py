@@ -27,11 +27,20 @@ from ..geom_components.fuselage.components import (
     ComputeFuselageGeometryCabinSizingH2
 )
 
+from ..geom_components.fuselage.compute_fuselage import ComputeFuselageH2
+
 from ..geometry import GeometryHydrogenFuselage
 
 def test_compute_fuselage_cabin_sizing_h2():
     ivc = get_indep_var_comp(
         list_inputs(ComputeFuselageGeometryCabinSizingH2(propulsion_id=ENGINE_WRAPPER)),
+        __file__,
+        XML_FILE,
+    )
+
+def test_compute_fuselage_h2():
+    ivc = get_indep_var_comp(
+        list_inputs(ComputeFuselageH2(propulsion_id=ENGINE_WRAPPER)),
         __file__,
         XML_FILE,
     )

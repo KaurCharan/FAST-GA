@@ -17,7 +17,8 @@ from openmdao.api import Group
 import fastoad.api as oad
 
 from .constants import (
-    SUBMODEL_WING_THICKNESS_RATIO,
+    SUBMODEL_WING_THICKNESS_RATIO_LEGACY,
+    SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC,
     SUBMODEL_WING_SPAN,
     SUBMODEL_WING_L1_L4,
     SUBMODEL_WING_L2_L3,
@@ -38,7 +39,7 @@ class ComputeWingGeometry(Group):
     def setup(self):
         self.add_subsystem(
             "wing_toc",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_WING_THICKNESS_RATIO),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC),
             promotes=["*"],
         )
         self.add_subsystem(
