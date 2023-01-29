@@ -1358,8 +1358,9 @@ def equilibrated_cl_cd_polar(
 
 def cd_inlets(XML_FILE: str):
 
-    ivc = get_indep_var_comp(list_inputs(Cd0Inlets()), __file__, XML_FILE)
+    ivc = get_indep_var_comp(list_inputs(Cd0Inlets(low_speed_aero=True)), __file__, XML_FILE)
 
-    problem = run_system(Cd0Inlets(), ivc)
+    problem = run_system(Cd0Inlets(low_speed_aero=True), ivc)
 
     inlet_drag = problem.get_val("data:aerodynamics:inlets:low_speed:CD0")
+    print(inlet_drag)

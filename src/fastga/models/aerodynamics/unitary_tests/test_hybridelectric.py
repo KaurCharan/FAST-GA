@@ -15,3 +15,4 @@ SKIP_STEPS = True  # avoid some tests to accelerate validation process (intermed
 def test_cd_inlets():
     """Tests maximum/minimum cl component with default result cl=f(y) curve."""
     cd_inlets(XML_FILE)
+

@@ -91,7 +91,7 @@ class NoDEPEffect(om.ExplicitComponent):
         self.add_input("altitude", val=np.full(number_of_points, np.nan), units="m")
         self.add_input("true_airspeed", val=np.full(number_of_points, np.nan), units="m/s")
 
-        self.add_input("alpha", val=np.full(number_of_points, np.nan), units="deg")
+        self.add_input("alpha", val=np.full(number_of_points, np.nan), units="rad")
         self.add_input("thrust", val=np.full(number_of_points, 0.0), units="N")
 
         self.add_output("delta_Cl", val=np.full(number_of_points, 0.0))
@@ -122,8 +122,8 @@ class NoDEPEffect(om.ExplicitComponent):
         wing_loading = MTOW / wing_area
         thrust_loading = thrust / MTOW
 
-        engine_spacing = 0.5 * diameter  # assumption / can also be used as user input
-        dep_to_span_ratio = ((N/2 * diameter + (N/2 - 1) * engine_spacing) / 0.5 * wing_span)
+        engine_spacing = diameter/2  # assumption / can also be used as user input
+        dep_to_span_ratio = ((N*diameter + (N - 1) * engine_spacing) / wing_span)
         dep_to_thrust_ratio = 1  # since all the thrust comes from DEP
         propeller_distance_ratio = 0.2  # assuming the propeller is 0.2c ahead of wing (xp/c)
         propeller_wing_angle = 0  # assuming engine is parallel to wing -> alpha_w = alpha_p
