@@ -17,12 +17,12 @@ import openmdao.api as om
 
 import fastoad.api as oad
 
-from ..constants import SUBMODEL_WING_THICKNESS_RATIO
+from ..constants import SUBMODEL_WING_THICKNESS_RATIO_LEGACY, SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC
 
 
 # TODO: computes relative thickness and generates profiles --> decompose
 @oad.RegisterSubmodel(
-    SUBMODEL_WING_THICKNESS_RATIO, "fastga.submodel.geometry.wing.thickness_ratio.legacy"
+    SUBMODEL_WING_THICKNESS_RATIO_LEGACY, "fastga.submodel.geometry.wing.thickness_ratio.legacy"
 )
 class ComputeWingToc(om.ExplicitComponent):
     # TODO: Document hypothesis. Cite sources
@@ -52,7 +52,7 @@ class ComputeWingToc(om.ExplicitComponent):
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_WING_THICKNESS_RATIO, "fastga.submodel.geometry.wing.thickness_ratio.electric"
+    SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC, "fastga.submodel.geometry.wing.thickness_ratio.electric"
 )
 class ComputeWingTocElectric(om.ExplicitComponent):
     # TODO: Document hypothesis. Cite sources
