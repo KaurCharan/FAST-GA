@@ -36,7 +36,7 @@ class UpdateWingArea(om.ExplicitComponent):
         self.add_input("wing_area:geometric", val=np.nan, units="m**2")
         self.add_input("wing_area:aerodynamic", val=np.nan, units="m**2")
 
-        self.add_output("data:geometry:wing:area", val=10.0, units="m**2")
+        self.add_output("data:geometry:wing:area", val=49.0, units="m**2")
 
         self.declare_partials(
             "data:geometry:wing:area",

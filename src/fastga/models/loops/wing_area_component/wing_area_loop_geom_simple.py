@@ -48,7 +48,7 @@ class UpdateWingAreaGeomSimple(om.ExplicitComponent):
         self.add_input("data:geometry:wing:root:thickness_ratio", val=np.nan)
         self.add_input("data:geometry:wing:tip:thickness_ratio", val=np.nan)
 
-        self.add_output("wing_area", val=10.0, units="m**2")
+        self.add_output("wing_area", val=49.0, units="m**2")
 
         self.declare_partials(
             "wing_area",

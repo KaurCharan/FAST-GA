@@ -1363,4 +1363,4 @@ def cd_inlets(XML_FILE: str):
     problem = run_system(Cd0Inlets(low_speed_aero=True), ivc)
 
     inlet_drag = problem.get_val("data:aerodynamics:inlets:low_speed:CD0")
-    print(inlet_drag)
+    print("Inlet drag is:", inlet_drag)

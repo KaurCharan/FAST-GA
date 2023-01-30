@@ -50,7 +50,7 @@ class NoDEPEffect(om.ExplicitComponent):
 
         self.add_input("data:geometry:propeller:diameter", val=np.nan, units="m")
         self.add_input("data:geometry:wing:span", val=np.nan, units="m")
-        self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
+        self.add_input("data:geometry:wing:area", val=49, units="m**2")
         self.add_input("data:geometry:wing:aspect_ratio", val=np.nan)
         self.add_input(
             "data:aerodynamics:wing:low_speed:Y_vector",
@@ -122,8 +122,10 @@ class NoDEPEffect(om.ExplicitComponent):
         wing_loading = MTOW / wing_area
         thrust_loading = thrust / MTOW
 
-        engine_spacing = diameter/2  # assumption / can also be used as user input
-        dep_to_span_ratio = ((N*diameter + (N - 1) * engine_spacing) / wing_span)
+        delta_y = 0.5
+        engine_spacing = delta_y * diameter
+        # assumption / can also be used as user input
+        dep_to_span_ratio = ((N * diameter + (N - 1) * engine_spacing) / wing_span)
         dep_to_thrust_ratio = 1  # since all the thrust comes from DEP
         propeller_distance_ratio = 0.2  # assuming the propeller is 0.2c ahead of wing (xp/c)
         propeller_wing_angle = 0  # assuming engine is parallel to wing -> alpha_w = alpha_p
@@ -131,7 +133,7 @@ class NoDEPEffect(om.ExplicitComponent):
         skin_friction_coefficient = 0.
 
         dp2_w = ((dep_to_span_ratio ** 2 * aspect_ratio) /
-                 (N ** 2 * (1 + engine_spacing) ** 2 * wing_loading))
+                 (N ** 2 * (1 + delta_y) ** 2 * wing_loading))
 
         t_c = ((dep_to_thrust_ratio * thrust_loading) /
                (N * density * velocity ** 2 * dp2_w))
@@ -145,18 +147,18 @@ class NoDEPEffect(om.ExplicitComponent):
 
         a_w = ((a_p + 1) / rw_rp ** 2) - 1
 
-        alpha_w = ((cl / 2 * np.pi * aspect_ratio)
+        alpha_w = ((cl / (2 * np.pi * aspect_ratio))
                    * (2 + np.sqrt(aspect_ratio ** 2 * (1 - mach ** 2) + 4)))
 
         delta_Cl = dep_to_span_ratio * 2 * np.pi * ((np.sin(alpha_w) - a_w * sideslip_correction_factor
-                                                     * np.sin(propeller_wing_angle))
+                                                     * np.sin(propeller_wing_angle - alpha_w))
                                                     * np.sqrt((a_w * sideslip_correction_factor) ** 2 + 2 * a_w *
-                                                              sideslip_correction_factor * np.cos(alpha_w) + 1)
+                                                              sideslip_correction_factor * np.cos(propeller_wing_angle) + 1)
                                                     - np.sin(alpha_w))
 
         delta_cd0 = dep_to_span_ratio * a_w ** 2 * skin_friction_coefficient
 
-        delta_cdi = (delta_Cl ** 2 + 2 * cl * delta_Cl) / coeff_k
+        delta_cdi = (delta_Cl ** 2 + 2 * cl * delta_Cl) * coeff_k
 
         delta_Cd = delta_cd0 + delta_cdi
 
