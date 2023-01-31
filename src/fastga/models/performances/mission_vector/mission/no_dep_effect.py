@@ -107,7 +107,7 @@ class NoDEPEffect(om.ExplicitComponent):
         aspect_ratio = inputs["data:geometry:wing:aspect_ratio"]
         N = inputs["data:geometry:propulsion:engine:count"]
         diameter = inputs["data:geometry:propeller:diameter"]
-        alpha = inputs["alpha"]
+        alpha = np.clip(inputs["alpha"], 0, None)
         cl_0 = inputs["data:aerodynamics:wing:cruise:CL0_clean"]
         cl_alpha = inputs["data:aerodynamics:wing:cruise:CL_alpha"]
         coeff_k = inputs["data:aerodynamics:wing:cruise:induced_drag_coefficient"]
