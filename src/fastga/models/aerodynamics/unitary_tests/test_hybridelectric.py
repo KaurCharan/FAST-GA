@@ -6,6 +6,7 @@ import pytest
 from .dummy_engines import ENGINE_WRAPPER_SR22 as ENGINE_WRAPPER
 from .test_functions import (
     cd_inlets,
+    cooling_airflow,
 
 )
 
