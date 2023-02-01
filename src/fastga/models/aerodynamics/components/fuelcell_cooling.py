@@ -24,7 +24,7 @@ class Cooling_Airflow(ExplicitComponent):
 
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("data:geometry:propulsion:fuelcell:power", val=np.nan, units="W")
+        self.add_input("fuelcell_Pelec_max", val=np.nan, units="W")
         self.add_input("altitude", val=np.full(number_of_points, np.nan), units="m")
 
         self.add_output("data:geometry:propulsion:fuelcell:cooling:airflow", units="kg/s")
@@ -35,7 +35,7 @@ class Cooling_Airflow(ExplicitComponent):
         altitude = inputs["altitude"]
         T_ain = Atmosphere(altitude, altitude_in_feet=False).temperature
 
-        power = inputs["data:geometry:propulsion:fuelcell:power"]
+        power = inputs["fuelcell_Pelec_max"]
 
         # Constants for estimating the specific heat capacity of air
         Cp_0 = 1005.7
