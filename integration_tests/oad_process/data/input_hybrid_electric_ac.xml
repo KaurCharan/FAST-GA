@@ -181,7 +181,7 @@
         <efficiency is_input="True">0.95<!-- desired efficiency of battery--></efficiency>
       </battery>
 
-      <fuel_type is_input="True">3.0<!--1=Avgas ICE engine / 2=Diesel ICE engine / 3=Jet A1--></fuel_type>
+      <fuel_type is_input="True">2.0<!--1=Avgas ICE engine / 2=Diesel ICE engine / 3=Jet A1--></fuel_type>
       <max_rpm units="min**-1" is_input="True">2000.0<!--maximum number of rotation per minute on the engine--></max_rpm>
       <IC_engine>
         <max_power units="W">231000.0<!--maximum power of the engine--></max_power>

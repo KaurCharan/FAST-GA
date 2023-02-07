@@ -1,8 +1,9 @@
-import math
+import logging
 import fastoad.api as oad
 import openmdao.api as om
 
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_CABLES_MASS
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(SUBMODEL_CABLES_MASS,
@@ -24,8 +25,8 @@ class ComputeCableMass(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:cables:weight")
 
     def specificMass(self, inputs, outputs):
-
-        outputs["data:geometry:propulsion:cables:weight"] = 500
+        _LOGGER.debug("Calculating cable parameters")
+        outputs["data:geometry:propulsion:cables:weight"] = 300  # in [kg]
 
     #     total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
     #                        * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \

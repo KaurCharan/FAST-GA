@@ -115,7 +115,7 @@ class Cd0Inlets(ExplicitComponent):
         incremental_drag = 0  # approximation from figure 15 for general aviation aircraft
 
         total_drag = ram_drag + spillage_drag + incremental_drag
-        inlet_drag = total_drag * inlets
+        inlet_drag = 0 #total_drag * inlets
 
         # outputs["data:geometry:inlets:width"] = inlet_width
         # outputs["data:geometry:inlets:maximum_height"] = max_external_height

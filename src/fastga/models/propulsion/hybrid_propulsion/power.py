@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Union, Sequence, Tuple, Optional
+import logging
 from scipy.interpolate import interp2d
 import numpy as np
 import fastoad.api as oad
@@ -25,6 +25,8 @@ from fastga.models.aerodynamics.external.propeller_code.compute_propeller_aero i
     THRUST_PTS_NB,
     SPEED_PTS_NB
 )
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(
@@ -43,7 +45,7 @@ class ComputePower(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("thrust_econ", val=np.full(number_of_points, 0.0), units="N")
-        self.add_input("altitude_econ", val=np.full(number_of_points, 0.0), units="m")
+        self.add_input("altitude_econ", val=np.full(number_of_points, 2000), units="m")
         self.add_input("true_airspeed_econ", val=np.full(number_of_points, 0.0), units="m/s")
         self.add_input("data:aerodynamics:propeller:cruise_level:altitude", units="m", val=np.nan)
         self.add_input("data:aerodynamics:propeller:sea_level:speed",
@@ -83,6 +85,7 @@ class ComputePower(om.ExplicitComponent):
         #self.add_output("thrust_rate_t", val=0, shape=number_of_points)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        _LOGGER.debug("Calculating shaft power")
         """
         Compute the propeller efficiency.
 
@@ -179,6 +182,7 @@ class ComputePower(om.ExplicitComponent):
         mechanical_power = (
                 thrust * true_airspeed / propeller_efficiency
         )
-        # mechanical_power = [1000 for i in range(250)]   ## TODO: comment when running full oad process
+        mechanical_power_check = np.where(mechanical_power < 0, 0, mechanical_power)
+        #mechanical_power_check = [150000 for i in range(252)]   ## TODO: comment when running full oad process
         #outputs["thrust_rate_t"] = np.zeros(252)
-        outputs["mechanical_power"] = mechanical_power
+        outputs["mechanical_power"] = mechanical_power_check

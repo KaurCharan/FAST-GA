@@ -11,6 +11,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import logging
 import numpy as np
 import openmdao.api as om
 
@@ -19,6 +20,8 @@ import fastoad.api as oad
 
 from fastga.models.propulsion.hybrid_propulsion.battery import BatteryModel
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_BATTERY_PARAMETERS
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(SUBMODEL_BATTERY_PARAMETERS,
@@ -88,12 +91,13 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_output("non_consumable_energy_t_econ", val=0, shape=number_of_points, units="W*h")
         self.add_output("data:geometry:propulsion:battery:volume", units="m**3", desc="volume of battery pack")
         self.add_output("data:geometry:propulsion:battery:weight", units="kg", desc="mass of battery pack")
-        self.add_output("data:propulsion:battery:soc", val=0, shape=101)
+        self.add_output("data:propulsion:battery:dod", val=0, shape=101)
         self.add_output("data:geometry:propulsion:battery:n_parallel")
         self.add_output("data:geometry:propulsion:battery:n_series")
         self.add_output("data:propulsion:battery:efficiency_out", val=0, shape=101)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        _LOGGER.debug("Calculating battery parameters")
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
                            * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \
                            inputs["cables_efficiency"] * inputs["battery_efficiency"]
@@ -105,34 +109,46 @@ class BatteryParameters(om.ExplicitComponent):
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])
         mechanical_power_climb = mechanical_power[0:100]
         electrical_power = list(range(len(mechanical_power_climb)))
-        electrical_power_TO = 0
         electrical_power_climb = mechanical_power_climb / total_efficiency
         for idx in range(np.size(electrical_power_climb)):
             if electrical_power_climb[idx] > fuelcell_Pelec_max:
                 electrical_power[idx] = float(abs(electrical_power_climb[idx] - fuelcell_Pelec_max))
             else:
                 electrical_power[idx] = 0
-        if (mechanical_power_TO / total_efficiency/ 0.70) > fuelcell_Pelec_max:
-            electrical_power_TO = float((mechanical_power_TO / total_efficiency / 0.70) - fuelcell_Pelec_max)
+        if (mechanical_power_TO / total_efficiency / 0.80) > fuelcell_Pelec_max:
+            electrical_power_TO = float((mechanical_power_TO / total_efficiency / 0.80) - fuelcell_Pelec_max)
+        else:
+            electrical_power_TO = 0
 
         # append power and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
         time_total = np.append(time_TO, time_step[0:100])
-        battery_model = BatteryModel(electrical_power_total, time_total)
+        if all(electrical_power_total == 0):
+            energy_consumed = np.zeros(252)
+            dod = np.zeros(101)
+            eff_bat = np.zeros(101)
+            volume_BatteryPack = 0
+            weight_BatteryPack = 0
+            n_series = 0
+            n_parallel = 0
+        else:
+            battery_model = BatteryModel(electrical_power_total, time_total)
 
-        # storing parameters
-        weight_cells, n_series, n_parallel, soc, eff_bat, C_rate, Q_used = battery_model.compute_soc()
-        weight_BatteryPack = battery_model.compute_weight(weight_cells)
-        volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
-        extra = [0.0 for i in range(152)]
-        energy_consumed = np.concatenate((Q_used[1:101], extra))
-        #energy_consumed = Q_used[1:101] + extra
-
+            # storing parameters
+            weight_cells, n_series, n_parallel, dod, eff_bat, C_rate, Q_used = battery_model.compute_soc()
+            weight_BatteryPack = battery_model.compute_weight(weight_cells)
+            volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
+            extra = [0.0 for i in range(152)]
+            #energy_consumed = np.concatenate((Q_used[1:101], extra))
+            energy_consumed = np.zeros(252)
+        print("total battery cells weight is", weight_cells)
+        print("total battery pack weight is", weight_BatteryPack)
+        print("number of modules in parallel", n_parallel)
         outputs["non_consumable_energy_t_econ"] = energy_consumed
-        outputs["data:propulsion:battery:soc"] = soc
+        outputs["data:propulsion:battery:dod"] = dod
         outputs["data:geometry:propulsion:battery:n_parallel"] = n_parallel
         outputs["data:geometry:propulsion:battery:n_series"] = n_series
-        outputs["data:geometry:propulsion:battery:weight"] = weight_BatteryPack  # [in kg]
+        outputs["data:geometry:propulsion:battery:weight"] = weight_BatteryPack # [in kg]
         outputs["battery_weight"] = weight_BatteryPack
         outputs["data:geometry:propulsion:battery:volume"] = volume_BatteryPack
         outputs["data:propulsion:battery:efficiency_out"] = eff_bat

@@ -100,6 +100,11 @@ class Cd0(Group):
             oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_OTHER, options=low_speed_option),
             promotes=["*"],
         )
+        self.add_subsystem(
+            "cd_inlets",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_INLETS, options=low_speed_option),
+            promotes=["*"]
+        )
 
         self.add_subsystem(
             "cd0_total",
@@ -107,8 +112,4 @@ class Cd0(Group):
             promotes=["*"],
         )
 
-        self.add_subsystem(
-            "cd_inlets",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_INLETS, options=low_speed_option),
-            promotes=["*"]
-        )
+

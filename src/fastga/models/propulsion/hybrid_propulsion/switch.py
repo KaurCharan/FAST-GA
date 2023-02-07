@@ -1,8 +1,10 @@
+import logging
 import fastoad.api as oad
 import openmdao.api as om
 import numpy as np
 
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_SWITCH_MASS
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(
@@ -37,13 +39,15 @@ class ComputeSwitchMass(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:switch:weight", units="kg", desc="switch mass")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        _LOGGER.debug("Calculating switch parameters")
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
                            * inputs["switch_efficiency"]
 
         mechanical_power_total = np.append(np.array(inputs["data:mission:sizing:takeoff:power"]),
                                            inputs["mechanical_power"])
-        max_power = max(mechanical_power_total)
+        max_power = max(mechanical_power_total) / 1000  # in [kW]
         electrical_power = max_power/total_efficiency
-        mass_switch = 1.6 * 10 ** -4 * electrical_power + 0.6
+        mass_switch = 1.6 * 1e-4 * electrical_power + 0.6
+
         outputs["switch_weight"] = mass_switch
         outputs["data:geometry:propulsion:switch:weight"] = mass_switch

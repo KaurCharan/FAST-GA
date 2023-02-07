@@ -1,8 +1,10 @@
+import logging
 import fastoad.api as oad
 import numpy as np
 import openmdao.api as om
 
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_CONVERTER_MASS
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(SUBMODEL_CONVERTER_MASS,
@@ -37,13 +39,14 @@ class ComputeConverterMass(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:converter:weight", units="kg", desc="motor mass of all motors")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        _LOGGER.debug("Calculating converter parameters")
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
                            * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"]
 
         # Power supplied to DC-DC converter [W]
         mechanical_power_total = np.append(np.array(inputs["data:mission:sizing:takeoff:power"]),
                                            inputs["mechanical_power"])
-        max_power = max(mechanical_power_total)
+        max_power = max(mechanical_power_total) / 1000  # in [kW]
         electrical_power = max_power / total_efficiency
 
         NfuelCell = inputs["data:geometry:propulsion:fuelcell:stacks"]  # Number of fuel cell stacks

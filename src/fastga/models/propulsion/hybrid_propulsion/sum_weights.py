@@ -1,7 +1,10 @@
+import logging
 import fastoad.api as oad
 import openmdao.api as om
 
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_SUMMATION_WEIGHTS
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(SUBMODEL_SUMMATION_WEIGHTS,
@@ -21,6 +24,7 @@ class SummationWeights(om.ExplicitComponent):
         self.add_output("data:propulsion:total_weight", units="kg")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        _LOGGER.debug("Calculating total power plant weight")
         summation = inputs["fuelcell_weight"] + inputs["converter_weight"] + inputs["battery_weight"] + \
                     inputs["switch_weight"] + inputs["motor_weight"] + inputs["cables_weight"] + \
                     1 * inputs["data:propulsion:controller:number"]

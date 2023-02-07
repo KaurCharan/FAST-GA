@@ -4,7 +4,7 @@ Created on Tue Oct 18 15:18:28 2022
 
 @author: Charan
 """
-
+import logging
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
@@ -13,6 +13,8 @@ import fastoad.api as oad
 import openmdao.api as om
 
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_FUELCELL_PARAMETERS
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @oad.RegisterSubmodel(SUBMODEL_FUELCELL_PARAMETERS,
@@ -29,7 +31,7 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:duration")
         self.add_input("data:propulsion:fuelcell:current")  ##### check
-        self.add_input("data:propulsion:voltage")  ####
+        self.add_input("data:propulsion:system_voltage")  ####
 
         self.add_input("motor_efficiency", val=0.85)
         self.add_input("fuelcell_efficiency", val=0.50)
@@ -92,6 +94,7 @@ class FuelcellParameters(om.ExplicitComponent):
 
         self.add_output("fuelcell_Pelec_max", shape=1)
         self.add_output("fuel_consumed_t_econ", val=0, shape=number_of_points)
+        self.add_output("data:geometry:propulsion:fuelcell:stacks", shape=1)
         self.add_output("data:geometry:propulsion:fuelcell:weight", shape=1)
         self.add_output("data:geometry:propulsion:fuelcell:volume", shape=1)
         self.add_output("data:geometry:propulsion:hydrogen:weight", shape=1)
@@ -101,6 +104,7 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:hydrogen:volume_liquid", shape=1)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        _LOGGER.debug("Calculating fuelcell parameters")
         total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
                            * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \
                            inputs["cables_efficiency"]
@@ -108,7 +112,7 @@ class FuelcellParameters(om.ExplicitComponent):
         time_step = inputs["time_step_econ"]
         FCeff = inputs["fuelcell_efficiency"]
         cell_current = inputs["data:propulsion:fuelcell:current"]
-        V_max = inputs["data:propulsion:voltage"]
+        V_max = inputs["data:propulsion:system_voltage"]
         P_oper = inputs["P_oper"]
         P_nom = inputs["P_nom"]
         single_stack_mass = inputs["single_stack_mass"]
@@ -155,7 +159,7 @@ class FuelcellParameters(om.ExplicitComponent):
         # power and time for descent
         electrical_power_descent = mechanical_power[200:250] / total_efficiency
         Descent_Pelec = electrical_power_descent
-        Taxi_Pelec = mechanical_power[250:252] / total_efficiency
+        Taxi_Pelec = 0#mechanical_power[250:252] / total_efficiency
         Descent_time = time_step[200:250]
         Taxi_time = time_step[250:252]
 
@@ -173,12 +177,12 @@ class FuelcellParameters(om.ExplicitComponent):
             V_cell.append(float(V_thermo - V_act - V_ohm - V_conc + delVp))
 
         # Plotting Polarization curve
-        plt.plot(I, V_cell)
-        plt.axis([0, 200, 0, 1.2])
-        plt.xlabel('Current [A]')
-        plt.ylabel('Cell Voltage [V]')
-        plt.title('Polarization Curve')
-        plt.grid()
+        # plt.plot(I, V_cell)
+        # plt.axis([0, 200, 0, 1.2])
+        # plt.xlabel('Current [A]')
+        # plt.ylabel('Cell Voltage [V]')
+        # plt.title('Polarization Curve')
+        # plt.grid()
 
         # User chooses the current to determine cell voltage
         cell_current = float(cell_current)
@@ -188,12 +192,12 @@ class FuelcellParameters(om.ExplicitComponent):
         # Take-off
         TO_Pelec_inFC = TO_Pelec / FCeff
         TO_H2_mass = (1.05 * 1e-8 * TO_Pelec_inFC / (mu_H2 * cell_voltage)) * TO_time
-        TO_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * TO_Pelec_inFC
+        TO_air_massflow = 2.856 * (1e-7) * lambdaO2 * TO_Pelec_inFC
 
         # Climb
         Climb_Pelec_inFC = Climb_Pelec / FCeff
         Climb_H2_mass = (1.05 * 1e-8 * Climb_Pelec_inFC / (mu_H2 * cell_voltage)) * Climb_time
-        Climb_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Climb_Pelec_inFC
+        Climb_air_massflow = 2.856 * (1e-7) * lambdaO2 * Climb_Pelec_inFC
 
         # Cruise
         Cruise_Imax = Cruise_Pelec_max / V_max
@@ -205,15 +209,15 @@ class FuelcellParameters(om.ExplicitComponent):
 
         Cruise_Pelec_inFC = Cruise_Pelec / FCeff
         Cruise_H2_mass = (1.05 * 1e-8 * Cruise_Pelec_inFC / (mu_H2 * cell_voltage)) * Cruise_time
-        Cruise_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Cruise_Pelec_inFC
+        Cruise_air_massflow = 2.856 * (1e-7) * lambdaO2 * Cruise_Pelec_inFC
 
         # Descent
         Descent_Pelec_inFC = Descent_Pelec / FCeff
         Taxi_Pelec_inFC = Taxi_Pelec / FCeff
         Descent_H2_mass = (1.05 * 1e-8 * Descent_Pelec_inFC / (mu_H2 * cell_voltage)) * Descent_time
         Taxi_H2_mass = (1.05 * 1e-8 * Taxi_Pelec_inFC / (mu_H2 * cell_voltage)) * Taxi_time
-        Descent_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Descent_Pelec_inFC
-        Taxi_air_massflow = 2.856 * (10 ^ -7) * lambdaO2 * Taxi_Pelec_inFC
+        Descent_air_massflow = 2.856 * (1e-7) * lambdaO2 * Descent_Pelec_inFC
+        Taxi_air_massflow = 2.856 * (1e-7) * lambdaO2 * Taxi_Pelec_inFC
 
         # FC stack mass
         FC_stack_mass = Cruise_stack_mass
@@ -260,6 +264,7 @@ class FuelcellParameters(om.ExplicitComponent):
         outputs["fuelcell_Pelec_max"] = float(Cruise_Pelec_max)
         outputs["fuelcell_weight"] = float(FC_stack_mass)
         outputs["fuel_consumed_t_econ"] = H2_mass_array
+        outputs["data:geometry:propulsion:fuelcell:stacks"] = Cruise_stacks
         outputs["data:geometry:propulsion:fuelcell:weight"] = float(FC_stack_mass)
         outputs["data:geometry:propulsion:fuelcell:volume"] = float(FC_stack_volume)
         outputs["data:geometry:propulsion:hydrogen:weight"] = float(H2_mass)
