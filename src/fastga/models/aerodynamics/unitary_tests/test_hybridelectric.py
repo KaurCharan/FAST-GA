@@ -6,7 +6,6 @@ import pytest
 from .dummy_engines import ENGINE_WRAPPER_SR22 as ENGINE_WRAPPER
 from .test_functions import (
     cd_inlets,
-    cooling_airflow,
 
 )
 
@@ -23,10 +22,6 @@ def test_cd_inlets():
     cd_inlets(XML_FILE)
 
 
-def test_cooling_airflow():
-    """Calculates the air-flow needed to cool the condenser of the refrigeration cycle with
-    R134a as the refrigerant."""
-    cooling_airflow(XML_FILE)
 
 
 

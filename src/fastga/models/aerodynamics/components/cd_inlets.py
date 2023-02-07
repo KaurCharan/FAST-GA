@@ -136,6 +136,3 @@ class Cd0Inlets(ExplicitComponent):
             outputs["data:geometry:inlets:throat:width"] = throat_thickness
 
 
-
-
-
