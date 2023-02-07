@@ -43,6 +43,7 @@ class Cd0Inlets(ExplicitComponent):
         self.add_input("data:geometry:fuselage:length", val=np.nan, units="ft")
         self.add_input("data:aerodynamics:wing:cruise:reynolds", val=np.nan)
         self.add_input("data:geometry:fuselage:number_of_inlets", val=np.nan)
+
         if self.options["low_speed_aero"]:
             self.add_output("data:aerodynamics:inlets:low_speed:CD0")
         else:

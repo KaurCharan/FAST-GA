@@ -21,7 +21,7 @@ from .constants import (
 class PropulsionHybrid(om.Group):
     def initialize(self):
         self.options.declare("propulsion_id", default=None, types=str, allow_none=True)
-        self.options.declare("number_of_points", default=None, types=int, allow_none=True)
+        self.options.declare("number_of_points", default=252, types=int, allow_none=True)
 
     def setup(self):
         options_equilibrium = {"number_of_points": self.options["number_of_points"]}
