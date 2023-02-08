@@ -53,7 +53,7 @@ class ComputeConverterMass(om.ExplicitComponent):
         Nbatt = inputs["data:geometry:propulsion:battery:stacks"]  # Number of battery stacks
         powerToMassRatio = inputs[
             "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [W/kg]
-        mass_inv_conv = (electrical_power * NfuelCell + electrical_power * Nbatt) / powerToMassRatio
+        mass_inv_conv = (electrical_power * 1 + 0 * 1) / powerToMassRatio
         mass_check = electrical_power / powerToMassRatio
 
         outputs["converter_weight"] = mass_inv_conv
