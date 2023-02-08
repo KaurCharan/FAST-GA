@@ -79,3 +79,4 @@ class ComputeMFWSimple(ExplicitComponent):
         mfw = mfv * m_vol_fuel
 
         outputs["data:weight:aircraft:MFW"] = mfw
+
