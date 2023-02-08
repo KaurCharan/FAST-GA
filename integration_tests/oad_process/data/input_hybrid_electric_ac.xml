@@ -4,7 +4,7 @@
       <NPAX_design is_input="True">8.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">150.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">270<!--top-level requirement: design range--></range>
-      <v_approach units="kn" is_input="True">82.0<!--top-level requirement: approach speed--></v_approach>
+      <v_approach units="kn" is_input="True">118.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">160.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">186.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
@@ -145,6 +145,13 @@
         </tip>
       </wing>
     </geometry>
+    <weight>
+      <propulsion>
+        <engine>
+          <mass units="kg" is_input="True">0.0 <!--distance between the tank CG and 25 percent of wing MAC a--></mass>
+        </engine>
+      </propulsion>
+    </weight>
     <propulsion>
       <system_voltage is_input="True">500<!--design system voltage--></system_voltage>
       <motor>
