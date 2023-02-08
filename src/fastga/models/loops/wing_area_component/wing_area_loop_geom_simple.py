@@ -14,7 +14,7 @@ simple computation.
 #  GNU General Public License for more details.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import logging
 import warnings
 
 import numpy as np
@@ -30,7 +30,7 @@ oad.RegisterSubmodel.active_models[
 oad.RegisterSubmodel.active_models[
     SUBMODEL_WING_AREA_GEOM_CONS
 ] = "fastga.submodel.loop.wing_area.constraint.geom.simple"
-
+_LOGGER = logging.getLogger(__name__)
 
 @oad.RegisterSubmodel(
     SUBMODEL_WING_AREA_GEOM_LOOP, "fastga.submodel.loop.wing_area.update.geom.simple"
@@ -47,6 +47,8 @@ class UpdateWingAreaGeomSimple(om.ExplicitComponent):
         self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
         self.add_input("data:geometry:wing:root:thickness_ratio", val=np.nan)
         self.add_input("data:geometry:wing:tip:thickness_ratio", val=np.nan)
+        #self.add_input("data:geometry:propulsion:battery:mass", val=np.nan, units="kg")
+        #self.add_input("data:geometry:propulsion:battery:volume", val=np.nan, units="m**3")
 
         self.add_output("wing_area", val=49.0, units="m**2")
 
@@ -71,6 +73,9 @@ class UpdateWingAreaGeomSimple(om.ExplicitComponent):
         root_thickness_ratio = inputs["data:geometry:wing:root:thickness_ratio"]
         tip_thickness_ratio = inputs["data:geometry:wing:tip:thickness_ratio"]
 
+        #battery_mass = inputs["data:geometry:propulsion:battery:mass"]
+        #battery_volume = inputs["data:geometry:propulsion:battery:volume"]
+
         if fuel_type == 1.0:
             m_vol_fuel = 730  # gasoline volume-mass [kg/m**3], cold worst case
         elif fuel_type == 2.0:
@@ -83,7 +88,10 @@ class UpdateWingAreaGeomSimple(om.ExplicitComponent):
         ave_thickness = (
             0.7 * (root_chord * root_thickness_ratio + tip_chord * tip_thickness_ratio) / 2.0
         )
-        wing_area_mission = (mfw_mission / m_vol_fuel) / (0.3 * ave_thickness)
+        wing_area_mission = mfw_mission / m_vol_fuel / (0.3*ave_thickness)
+        #wing_area_mission = battery_volume / (0.3 * ave_thickness)
+        #_LOGGER.debug("The battery volume is"+ str(float(battery_volume)))
+        #_LOGGER.debug("The avg. thickness is"+ str(float(0.3*ave_thickness)))
 
         outputs["wing_area"] = wing_area_mission
 
@@ -95,6 +103,8 @@ class UpdateWingAreaGeomSimple(om.ExplicitComponent):
         tip_chord = inputs["data:geometry:wing:tip:chord"]
         root_thickness_ratio = inputs["data:geometry:wing:root:thickness_ratio"]
         tip_thickness_ratio = inputs["data:geometry:wing:tip:thickness_ratio"]
+        #battery_mass = inputs["data:geometry:propulsion:battery:mass"]
+        #battery_volume = inputs["data:geometry:propulsion:battery:volume"]
 
         if fuel_type == 1.0:
             m_vol_fuel = 730  # gasoline volume-mass [kg/m**3], cold worst case
