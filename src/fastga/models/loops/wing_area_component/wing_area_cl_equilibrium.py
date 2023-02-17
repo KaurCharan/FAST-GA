@@ -79,7 +79,7 @@ class UpdateWingAreaLiftEquilibrium(om.ExplicitComponent):
         self.add_input("data:mission:sizing:landing:elevator_angle", val=np.nan, units="deg")
         self.add_input("data:mission:sizing:takeoff:elevator_angle", val=np.nan, units="deg")
 
-        self.add_output("wing_area", val=49.0, units="m**2")
+        self.add_output("wing_area", val=10.0, units="m**2")
 
         self.declare_partials(
             "wing_area",

@@ -25,10 +25,11 @@ class ComputeSwitchMass(om.ExplicitComponent):
 
         self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power", np.nan)
-        self.add_input("motor_efficiency", val=0.85)
-        self.add_input("switch_efficiency", val=0.95)
+        self.add_input("motor_efficiency", val=0.93)
+        self.add_input("switch_efficiency", val=0.97)
         self.add_input("gearbox_efficiency", val=0.98)
-        self.add_input("controller_efficiency", val=0.95)
+        self.add_input("controller_efficiency", val=0.97)
+
         self.add_output(
             "switch_weight",
             val=50.00,

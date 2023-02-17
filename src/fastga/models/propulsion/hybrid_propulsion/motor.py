@@ -24,7 +24,7 @@ class ComputeMotorMass(om.ExplicitComponent):
 
         self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power", np.nan)
-        self.add_input("motor_efficiency", val=0.85)
+        self.add_input("motor_efficiency", val=0.93)
         self.add_input("data:propulsion:motor:number", val=8, desc="number of motors")  #### check input
         self.add_output(
             "motor_weight",

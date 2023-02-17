@@ -10,22 +10,25 @@ _LOGGER = logging.getLogger(__name__)
                       "fastga.submodel.propulsion.hybrid_propulsion.cables.legacy")
 class ComputeCableMass(om.ExplicitComponent):
     def setup(self):
-        self.add_input("motor_efficiency", val=0.85)
-        self.add_input("switch_efficiency", val=0.95)
+        self.add_input("motor_efficiency", val=0.93)
+        self.add_input("battery_efficiency", val=0.98)
+        self.add_input("switch_efficiency", val=0.97)
         self.add_input("gearbox_efficiency", val=0.98)
-        self.add_input("controller_efficiency", val=0.95)
-        self.add_input("bus_efficiency", val=0.95)
-        self.add_input("converter_efficiency", val=0.90)
-        self.add_input("cables_efficiency", val=0.80)
+        self.add_input("controller_efficiency", val=0.97)
+        self.add_input("bus_efficiency", val=0.97)
+        self.add_input("converter_efficiency", val=0.97)
+        self.add_input("cables_efficiency", val=0.99)
         self.add_input("rho_aluminium", val=2.8 * 1000)   # [kg/m^3]
         self.add_input("rho_copper", val=8.9 * 1000)   # [kg/m^3]
 
         self.add_input("data:propulsion:cables:current")
         self.add_input("data:propulsion:cables:voltage")
-        self.add_output("data:geometry:propulsion:cables:weight")
+        self.add_output("cables_weight")
+        self.add_output("data:geometry:propulsion:cables:weight", units="kg")
 
-    def specificMass(self, inputs, outputs):
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         _LOGGER.debug("Calculating cable parameters")
+        outputs["cables_weight"] = 300
         outputs["data:geometry:propulsion:cables:weight"] = 300  # in [kg]
 
     #     total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \

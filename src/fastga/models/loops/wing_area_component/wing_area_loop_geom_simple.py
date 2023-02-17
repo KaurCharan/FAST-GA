@@ -50,7 +50,7 @@ class UpdateWingAreaGeomSimple(om.ExplicitComponent):
         #self.add_input("data:geometry:propulsion:battery:mass", val=np.nan, units="kg")
         #self.add_input("data:geometry:propulsion:battery:volume", val=np.nan, units="m**3")
 
-        self.add_output("wing_area", val=49.0, units="m**2")
+        self.add_output("wing_area", val=10.0, units="m**2")
 
         self.declare_partials(
             "wing_area",

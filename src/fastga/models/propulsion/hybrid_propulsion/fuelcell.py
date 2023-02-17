@@ -33,14 +33,14 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_input("data:propulsion:fuelcell:current")  ##### check
         self.add_input("data:propulsion:system_voltage")  ####
 
-        self.add_input("motor_efficiency", val=0.85)
         self.add_input("fuelcell_efficiency", val=0.50)
-        self.add_input("switch_efficiency", val=0.95)
+        self.add_input("motor_efficiency", val=0.93)
+        self.add_input("switch_efficiency", val=0.97)
         self.add_input("gearbox_efficiency", val=0.98)
-        self.add_input("controller_efficiency", val=0.95)
-        self.add_input("bus_efficiency", val=0.95)
-        self.add_input("converter_efficiency", val=0.90)
-        self.add_input("cables_efficiency", val=0.80)
+        self.add_input("controller_efficiency", val=0.97)
+        self.add_input("bus_efficiency", val=0.97)
+        self.add_input("converter_efficiency", val=0.97)
+        self.add_input("cables_efficiency", val=0.99)
 
         self.add_input("P_oper", val=1.0)
         self.add_input("P_nom", val=1.0)
