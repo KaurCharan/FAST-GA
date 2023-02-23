@@ -37,10 +37,10 @@ class BatteryParameters(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("mechanical_power", shape=number_of_points)
-        self.add_input("data:mission:sizing:takeoff:power")
-        self.add_input("data:mission:sizing:takeoff:duration")
-        self.add_input("fuelcell_Pelec_max")
+        self.add_input("mechanical_power", units="W", shape=number_of_points)
+        self.add_input("data:mission:sizing:takeoff:power", units="W")
+        self.add_input("data:mission:sizing:takeoff:duration", units="s")
+        self.add_input("fuelcell_Pelec_max", units="W")
         self.add_input("motor_efficiency", val=0.93)
         self.add_input("battery_efficiency", val=0.98)
         self.add_input("switch_efficiency", val=0.97)
@@ -71,13 +71,13 @@ class BatteryParameters(om.ExplicitComponent):
         )
         self.add_output(
             "battery_weight",
-            val=1375.00,
+            val=980.00,
             units="kg",
             desc="mass of all battery packs",
         )
         self.add_output(
             "volume_BatteryPack",
-            val=2.00,
+            val=0.6,
             units="m**3",
             desc="volume of all battery packs",
         )
@@ -92,12 +92,6 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:battery:volume", units="m**3", desc="volume of battery pack")
         self.add_output("data:geometry:propulsion:battery:weight", units="kg", desc="mass of battery pack")
         self.add_output("data:propulsion:battery:dod", val=0, shape=101)
-        self.add_output("data:geometry:propulsion:battery:C_rate", val=0, shape=101)
-        self.add_output("data:geometry:propulsion:battery:time_sum", val=0, shape=1)
-        self.add_output("data:geometry:propulsion:battery:dod_sum", val=0, shape=1)
-        self.add_output("data:geometry:propulsion:battery:Q_sum", val=0, shape=1)
-        self.add_output("data:geometry:propulsion:battery:V_end", val=0, shape=1)
-        self.add_output("data:geometry:propulsion:battery:del_V_sum", val=0, shape=1)
         self.add_output("data:geometry:propulsion:battery:n_parallel")
         self.add_output("data:geometry:propulsion:battery:n_series")
         self.add_output("data:propulsion:battery:efficiency_out", val=0, shape=101)
@@ -117,11 +111,6 @@ class BatteryParameters(om.ExplicitComponent):
         electrical_power = list(range(len(mechanical_power_climb)))
         electrical_power_climb = mechanical_power_climb / total_efficiency
         weight_cells=0
-        dod_sum=0
-        Q_sum=0
-        V_end=0
-        del_V_sum=0
-        time_sum=0
         for idx in range(np.size(electrical_power_climb)):
             if electrical_power_climb[idx] > fuelcell_Pelec_max:
                 electrical_power[idx] = float(abs(electrical_power_climb[idx] - fuelcell_Pelec_max))
@@ -135,19 +124,20 @@ class BatteryParameters(om.ExplicitComponent):
         # append power and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
         time_total = np.append(time_TO, time_step[0:100])
-        if all(electrical_power_total == 0):
+        if all(electrical_power_total == 0) or (any(ele > 3e6 for ele in electrical_power_total) == 1):
             energy_consumed = np.zeros(252)
             dod = np.zeros(101)
             eff_bat = np.zeros(101)
-            volume_BatteryPack = 2
-            weight_BatteryPack = 0
+            volume_BatteryPack = 0.6
+            weight_BatteryPack = 980
             n_series = 0
             n_parallel = 0
+            _LOGGER.debug("Skipped battery model")
         else:
             battery_model = BatteryModel(electrical_power_total, time_total)
 
             # storing parameters
-            weight_cells, n_series, n_parallel, dod, eff_bat, C_rate, Q_used, dod_sum, Q_sum, V_end, del_V_sum, C_rate, time_sum = battery_model.compute_soc()
+            weight_cells, n_series, n_parallel, dod, eff_bat, Q_used= battery_model.compute_soc()
             weight_BatteryPack = battery_model.compute_weight(weight_cells)
             volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
             extra = [0.0 for i in range(152)]
@@ -158,15 +148,10 @@ class BatteryParameters(om.ExplicitComponent):
         print("number of modules in parallel", n_parallel)
         outputs["non_consumable_energy_t_econ"] = energy_consumed
         outputs["data:propulsion:battery:dod"] = dod
-        outputs["data:geometry:propulsion:battery:dod_sum"] = dod_sum
-        outputs["data:geometry:propulsion:battery:Q_sum"] = Q_sum
-        outputs["data:geometry:propulsion:battery:V_end"] = V_end
-        outputs["data:geometry:propulsion:battery:del_V_sum"] = del_V_sum
         outputs["data:geometry:propulsion:battery:n_parallel"] = n_parallel
         outputs["data:geometry:propulsion:battery:n_series"] = n_series
         outputs["data:geometry:propulsion:battery:weight"] = weight_BatteryPack # [in kg]
-        outputs["data:geometry:propulsion:battery:C_rate"] = C_rate
-        outputs["data:geometry:propulsion:battery:time_sum"] = time_sum
         outputs["battery_weight"] = weight_BatteryPack
         outputs["data:geometry:propulsion:battery:volume"] = volume_BatteryPack
         outputs["data:propulsion:battery:efficiency_out"] = eff_bat
+        print("hehe")

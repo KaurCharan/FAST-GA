@@ -43,7 +43,7 @@ class BatteryModel:
         V_cell = 3.3  # single cell nominal voltage [Volt] !!fixed!!
         V_nom = 3.6
         V_cell_max = 4.2  # single cell max voltage [Volt]
-        V_cutoff = 0  # cut-off voltage [Volt]
+        V_cutoff = 2.5  # cut-off voltage [Volt]
         Q_rat = 3  # rated capacity of cell [Ah]
         I_rat = 3  # rated current [Amp]
         I_max = 20  # max continuous current [Amp]
@@ -104,15 +104,28 @@ class BatteryModel:
                 Ib[i] = 0
                 if i == 0:
                     Vc[i] = V_cell_max
-                    del_V[i] = 0
                 else:
                     Vc[i] = Vc[i-1]
-                    del_V[i] = abs(Vc[i] - Vc[i-1])
                 i = i + 1
                 continue
             else:
                 while abs(Pb - P_in[i]) > 10 ** -5:
-                    #Ib[i] = (P_in[i]) / (n_parallel * vol_elecSys)
+                    if P_in[i] == 0:
+                        Ib[i] = 0
+                        Q_used[i] = 0
+                        if i == 0:
+                            Vc[i] = V_cell_max
+                        else:
+                            Vc[i] = Vc[i - 1]
+                        dod[i] = 0
+                        eff_bat[i] = 0
+                        C_rate[i] = 0
+                        Vb_est[i] = Vc[i] * n_series
+                        i = i + 1
+                        Ib[i] = (P_in[i]) / (n_parallel * Vb_est[i - 1])  # estimate of discharge current
+                        Vb_est[i] = Vc[i] * n_series
+                        continue
+
                     ## BATTERY MODEL
                     pc = 1.0085
                     p3 = 0.003
@@ -124,22 +137,17 @@ class BatteryModel:
                     K = 0.0165
 
                     Qb = Q_rat * ((I_rat / Ib[i]) ** (pc - 1))
+                    Q_used[i] = Ib[i] * t[i]
                     C = Ib[i] / Q_rat
                     B = p3 * (C ** 3) + p2 * (C ** 2) + p1 * C + p0
-                    q = K * (Qb / (Qb - Ib[i] * t[i]))
-                    r = A * 2.718 ** -(B * Ib[i] * t[i])
+                    y = sum(Q_used[0:i])
+                    q = K * (Qb / (Qb - y))
+                    r = A * 2.718 ** -(B * y)
                     s = R * Ib[i]
-                    if i == 0:
-                        Vc[i] = Voc - q + r - s
-                        del_V[i] = abs(V_cell_max - Vc[i])
-                    else:
-                        Vc[i] = Voc - q + r - s - sum(del_V)  # actual voltage of a cell
+                    Vc[i] = Voc - q + r - s  # actual voltage of a cell
 
                     if Vc[i] <= V_cutoff:
-                    #if Q_sum > 2.4:
                         n_parallel = n_parallel + 20
-                        #del_V[i] = 0
-                        del_V = np.zeros(len(Power))
                         Vb_est = np.zeros(len(Power))
                         dod = np.zeros(len(Power))
                         eff_bat = np.zeros(len(Power))
@@ -148,85 +156,58 @@ class BatteryModel:
                         Ib = np.zeros(len(Power))
                         Q_used = np.zeros(len(Power))
                         i = 0
-                        # if P_in[i] == 0:
-                        #     Vc[i] = V_cell_max
-                        #     Ib[i] = 0
-                        # else:
-                        #     Ib[i] = (P_in[i]) / (n_parallel * vol_elecSys)
-                        #     Qb = Q_rat * ((I_rat / Ib[i]) ** (pc - 1))
-                        #     B = p3 * (C ** 3) + p2 * (C ** 2) + p1 * C + p0
-                        #     q = K * (Qb / (Qb - Ib[i] * t[i]))
-                        #     r = A * 2.718 ** -(B * Ib[i] * t[i])
-                        #     s = R * Ib[i]
-                        #     Vc[0] = Voc - q + r - s
-                        # C = Ib[i] / Q_rat
 
                     if P_in[i] == 0:
                         Ib[i] = 0
                         Q_used[i] = 0
                         if i == 0:
                             Vc[i] = V_cell_max
-                            del_V[i] = abs(V_cell_max - Vc[i])
                         else:
                             Vc[i] = Vc[i-1]
-                            del_V[i] = abs(Vc[i] - Vc[i-1])
                         dod[i] = 0
                         eff_bat[i] = 0
-                        #C = 0
                         C_rate[i] = 0
                         Vb_est[i] = Vc[i] * n_series
                         i = i + 1
-                        Ib[i] = (P_in[i]) / (n_parallel * Vb_est[i-1])  # estimate of discharge current
-                        Qb = Q_rat * ((I_rat / Ib[i]) ** (pc - 1))
-                        C = Ib[i] / Q_rat
-                        B = p3 * (C ** 3) + p2 * (C ** 2) + p1 * C + p0
-                        q = K * (Qb / (Qb - Ib[i] * t[i]))
-                        r = A * 2.718 ** -(B * Ib[i] * t[i])
-                        s = R * Ib[i]
-                        Vc[i] = Voc - q + r - s - sum(del_V)
+                        Ib[i] = (P_in[i]) / (n_parallel * Vb_est[i - 1])  # estimate of discharge current
                         Vb_est[i] = Vc[i] * n_series
-                        del_V[i] = abs(Vc[i] - Vc[i-1])
                         continue
                     else:
                         if i == 0:
                             Ib[i] = (P_in[i]) / (n_parallel * vol_elecSys)  # estimate of discharge current
                             Qb = Q_rat * ((I_rat / Ib[i]) ** (pc - 1))
+                            Q_used[i] = Ib[i] * t[i]
                             C = Ib[i] / Q_rat
                             B = p3 * (C ** 3) + p2 * (C ** 2) + p1 * C + p0
-                            q = K * (Qb / (Qb - Ib[i] * t[i]))
-                            r = A * 2.718 ** -(B * Ib[i] * t[i])
+                            y = sum(Q_used[0:i])
+                            q = K * (Qb / (Qb - y))
+                            r = A * 2.718 ** -(B * y)
                             s = R * Ib[i]
                             Vc[i] = Voc - q + r - s
-                            del_V[i] = abs(V_cell_max - Vc[i])
-                        else:
-                            del_V[i] = abs(Vc[i] - Vc[i-1])
+
                         Vb_est[i] = Vc[i] * n_series  # estimated voltage of a module
                         Ib[i] = (P_in[i] / n_parallel) / Vb_est[i]
                         Q_used[i] = Ib[i] * t[i]
                         C = Ib[i] / Q_rat
                         Pb = Vc[i] * Ib[i] * n_series * n_parallel  # calculated power of pack
-                        if i == 0:
-                            del_V[i] = abs(V_cell_max - Vc[i])
-                        else:
-                            del_V[i] = abs(Vc[i] - Vc[i-1])
 
                 #del_V[i] = 4.2 - Vc[i]
-                Q_used[i] = Ib[i] * t[i]  # + Q_used[i - 1]  # [Ah]
-                # Q_remain = Q_rat - Q_used[i]
+                Q_used[i] = Ib[i] * t[i]  # [Ah]
                 C_rate[i] = C  # discharge rate
                 dod[i] = Ib[i] * t[i] * 100 / Q_rat
                 eff_bat[i] = 1 - Ib[i] * R / Voc
-                Q_sum = sum(Q_used)
-                dod_sum = sum(dod)
-                del_V_sum = sum(del_V)
-                V_end = Vc[100]
                 i = i + 1
 
         # n = Q_remain / Q_rat
         if n_parallel > 600:
             print("n_parallel greater than 600")
         weight = n_parallel * n_series * cell_mass
-        return weight, n_series, n_parallel, dod, eff_bat, C_rate, Q_used, dod_sum, Q_sum, V_end, del_V_sum, Ib, time_sum
+        print("voltage is", np.ndarray.tolist(Vc))
+        print("power for battery is", np.ndarray.tolist(Power))
+        print("time is", np.ndarray.tolist(t_duration))
+        print("weight is ", weight)
+        print("cells in parallel", n_parallel)
+        return weight, n_series, n_parallel, dod, eff_bat, Q_used
 
     def compute_weight(self, weight_cells):
         """
