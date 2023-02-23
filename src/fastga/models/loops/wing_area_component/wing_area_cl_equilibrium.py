@@ -79,7 +79,7 @@ class UpdateWingAreaLiftEquilibrium(om.ExplicitComponent):
         self.add_input("data:mission:sizing:landing:elevator_angle", val=np.nan, units="deg")
         self.add_input("data:mission:sizing:takeoff:elevator_angle", val=np.nan, units="deg")
 
-        self.add_output("wing_area", val=49.0, units="m**2")
+        self.add_output("wing_area", val=10.0, units="m**2")
 
         self.declare_partials(
             "wing_area",
@@ -245,7 +245,7 @@ def compute_wing_area(inputs, propulsion_id):
 
     model.nonlinear_solver = om.NewtonSolver(solve_subsystems=True)
     model.nonlinear_solver.options["iprint"] = 2
-    model.nonlinear_solver.options["maxiter"] = 100
+    model.nonlinear_solver.options["maxiter"] = 20
     model.nonlinear_solver.options["rtol"] = 1e-4
     model.linear_solver = om.DirectSolver()
 

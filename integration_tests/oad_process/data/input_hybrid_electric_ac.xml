@@ -4,7 +4,7 @@
       <NPAX_design is_input="True">8.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">150.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">270<!--top-level requirement: design range--></range>
-      <v_approach units="kn" is_input="True">82.0<!--top-level requirement: approach speed--></v_approach>
+      <v_approach units="kn" is_input="True">118.0<!--top-level requirement: approach speed--></v_approach>
       <v_cruise units="kn" is_input="True">160.0<!--top-level requirement: cruise speed--></v_cruise>
       <v_max_sl units="kn" is_input="True">186.0<!--maximum speed at sea level--></v_max_sl>
     </TLAR>
@@ -145,6 +145,13 @@
         </tip>
       </wing>
     </geometry>
+    <weight>
+      <propulsion>
+        <engine>
+          <mass units="kg" is_input="True">0.0 <!--distance between the tank CG and 25 percent of wing MAC a--></mass>
+        </engine>
+      </propulsion>
+    </weight>
     <propulsion>
       <system_voltage is_input="True">500<!--design system voltage--></system_voltage>
       <motor>
@@ -181,7 +188,7 @@
         <efficiency is_input="True">0.95<!-- desired efficiency of battery--></efficiency>
       </battery>
 
-      <fuel_type is_input="True">3.0<!--1=Avgas ICE engine / 2=Diesel ICE engine / 3=Jet A1--></fuel_type>
+      <fuel_type is_input="True">2.0<!--1=Avgas ICE engine / 2=Diesel ICE engine / 3=Jet A1--></fuel_type>
       <max_rpm units="min**-1" is_input="True">2000.0<!--maximum number of rotation per minute on the engine--></max_rpm>
       <IC_engine>
         <max_power units="W">231000.0<!--maximum power of the engine--></max_power>
@@ -213,7 +220,7 @@
         </initial_climb>
         <takeoff>
           <duration units="s" is_input="False">150</duration>
-          <power units="W" is_input="False">1160000</power>
+          <power units="W" is_input="False">890000</power>
           <energy units="W*h" is_input="False">0.0</energy>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
           <friction_coefficient_no_brake is_input="True">0.03<!--friction coefficient used during the computation of the takeoff phase--></friction_coefficient_no_brake>

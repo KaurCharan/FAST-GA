@@ -277,7 +277,7 @@
           <energy units="W*h" is_input="False">0.0</energy>
         </initial_climb>
         <takeoff>
-          <power units="W" is_inout="False">18000</power>
+          <power units="W" is_inout="False">1160000</power>
           <energy units="W*h" is_input="False">0.0</energy>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
           <friction_coefficient_no_brake is_input="True">0.03<!--friction coefficient used during the computation of the takeoff phase--></friction_coefficient_no_brake>

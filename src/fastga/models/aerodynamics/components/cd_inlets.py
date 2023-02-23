@@ -43,6 +43,7 @@ class Cd0Inlets(ExplicitComponent):
         self.add_input("data:geometry:fuselage:length", val=np.nan, units="ft")
         self.add_input("data:aerodynamics:wing:cruise:reynolds", val=np.nan)
         self.add_input("data:geometry:fuselage:number_of_inlets", val=np.nan)
+        self.add_input("data:geometry:wing:area", val=np.nan, units="ft**2")
 
         if self.options["low_speed_aero"]:
             self.add_output("data:aerodynamics:inlets:low_speed:CD0")
@@ -66,6 +67,7 @@ class Cd0Inlets(ExplicitComponent):
         fuselage_length = inputs["data:geometry:fuselage:length"]
         fuelcell_airflow = inputs["data:geometry:propulsion:fuelcell:air_flow"]
         inlets = inputs["data:geometry:fuselage:number_of_inlets"]
+        wing_area = inputs["data:geometry:wing:area"]
 
         speed_of_sound = Atmosphere(cruise_alt, altitude_in_feet=False).speed_of_sound
         mach = v_cruise / speed_of_sound
@@ -114,15 +116,8 @@ class Cd0Inlets(ExplicitComponent):
 
         incremental_drag = 0  # approximation from figure 15 for general aviation aircraft
 
-        total_drag = ram_drag + spillage_drag + incremental_drag
+        total_drag = (ram_drag + spillage_drag + incremental_drag)*(inlet_area/wing_area)
         inlet_drag = total_drag * inlets
-
-        # outputs["data:geometry:inlets:width"] = inlet_width
-        # outputs["data:geometry:inlets:maximum_height"] = max_external_height
-        # outputs["data:geometry:inlets:lip_height"] = lip_height
-        # outputs["data:geometry:inlets:area"] = inlet_area
-        # outputs["data:geometry:inlets:throat:length"] = throat_length
-        # outputs["data:geometry:inlets:throat:width"] = throat_thickness
 
         if self.options["low_speed_aero"]:
             outputs["data:aerodynamics:inlets:low_speed:CD0"] = inlet_drag
@@ -134,8 +129,5 @@ class Cd0Inlets(ExplicitComponent):
             outputs["data:geometry:inlets:area"] = inlet_area
             outputs["data:geometry:inlets:throat:length"] = throat_length
             outputs["data:geometry:inlets:throat:width"] = throat_thickness
-
-
-
 
 

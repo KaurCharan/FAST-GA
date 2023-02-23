@@ -56,3 +56,4 @@ submodels:
     submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
     submodel.geometry.wing.thickness_ratio: fastga.submodel.geometry.wing.thickness_ratio.electric
     submodel.performances.energy_consumption: fastga.propulsion.hybrid_propulsion
+    submodel.weight.mass.propulsion.installed_engine: null

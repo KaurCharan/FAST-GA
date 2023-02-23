@@ -61,7 +61,7 @@ class ComputeWingTocElectric(om.ExplicitComponent):
     def setup(self):
 
         self.add_input("data:geometry:wing:thickness_ratio", val=np.nan)
-        self.add_input("data:geometry:wing:outer_area", val=np.nan, units="m**2")
+        self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
         self.add_input("data:geometry:propulsion:battery:volume", val=np.nan, units="m**3")
         self.add_input("data:geometry:wing:root:chord", val=np.nan, units="m")
         self.add_input("data:geometry:wing:tip:chord", val=np.nan, units="m")
@@ -75,11 +75,11 @@ class ComputeWingTocElectric(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        wing_area = inputs["data:geometry:wing:outer_area"]
+        wing_area = inputs["data:geometry:wing:area"]
         battery_volume = inputs["data:geometry:propulsion:battery:volume"]
         wing_root_chord = inputs["data:geometry:wing:root:chord"]
         wing_tip_chord = inputs["data:geometry:wing:tip:chord"]
-        wing_kink_chord = inputs["data:geometry:wing:tip:chord"]
+        wing_kink_chord = inputs["data:geometry:wing:kink:chord"]
 
         avg_wing_thickness = battery_volume/wing_area
 
