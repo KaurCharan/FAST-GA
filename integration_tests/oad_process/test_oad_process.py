@@ -43,7 +43,7 @@ NOTEBOOKS_PATH = pth.join(NOTEBOOKS_PATH, "notebooks")
 def cleanup():
     """Empties results folder to avoid any conflicts."""
     rmtree(RESULTS_FOLDER_PATH, ignore_errors=True)
-    rmtree("D:/tmp", ignore_errors=True)
+    # rmtree("D:/tmp", ignore_errors=True)
 
 #
 # def test_oad_process_vlm_sr22(cleanup):

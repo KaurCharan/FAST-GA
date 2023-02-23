@@ -23,8 +23,8 @@ class ComputeSwitchMass(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("mechanical_power", shape=number_of_points)
-        self.add_input("data:mission:sizing:takeoff:power", np.nan)
+        self.add_input("mechanical_power", units="W", shape=number_of_points)
+        self.add_input("data:mission:sizing:takeoff:power", units="W")
         self.add_input("motor_efficiency", val=0.93)
         self.add_input("switch_efficiency", val=0.97)
         self.add_input("gearbox_efficiency", val=0.98)
@@ -48,7 +48,10 @@ class ComputeSwitchMass(om.ExplicitComponent):
                                            inputs["mechanical_power"])
         max_power = max(mechanical_power_total) / 1000  # in [kW]
         electrical_power = max_power/total_efficiency
-        mass_switch = 1.6 * 1e-4 * electrical_power + 0.6
+        if any(ele > 1e6 for ele in electrical_power) == 1:
+            mass_switch = 1
+        else:
+            mass_switch = 1.6 * 1e-4 * electrical_power + 0.6
 
         outputs["switch_weight"] = mass_switch
         outputs["data:geometry:propulsion:switch:weight"] = mass_switch

@@ -117,7 +117,7 @@ class Cd0Inlets(ExplicitComponent):
         incremental_drag = 0  # approximation from figure 15 for general aviation aircraft
 
         total_drag = (ram_drag + spillage_drag + incremental_drag)*(inlet_area/wing_area)
-        inlet_drag = total_drag * inlets
+        inlet_drag = 0 #total_drag * inlets
 
         if self.options["low_speed_aero"]:
             outputs["data:aerodynamics:inlets:low_speed:CD0"] = inlet_drag

@@ -76,7 +76,7 @@ class Equilibrium(om.ImplicitComponent):
         self.add_input("delta_Cm", val=np.full(number_of_points, 0.0))
 
         self.add_output("alpha", val=np.full(number_of_points, 5.0), units="deg")
-        self.add_output("thrust", val=np.full(number_of_points, 1000.0), units="N")
+        self.add_output("thrust", val=np.full(number_of_points, 5000.0), units="N")
         self.add_output("delta_m", val=np.full(number_of_points, -5.0), units="deg")
 
         self.declare_partials(

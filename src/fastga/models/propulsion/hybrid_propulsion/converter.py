@@ -18,8 +18,8 @@ class ComputeConverterMass(om.ExplicitComponent):
     def setup(self):
         number_of_points = self.options["number_of_points"]
 
-        self.add_input("mechanical_power", shape=number_of_points)
-        self.add_input("data:mission:sizing:takeoff:power")
+        self.add_input("mechanical_power", units="W", shape=number_of_points)
+        self.add_input("data:mission:sizing:takeoff:power", units="W")
         self.add_input("motor_efficiency", val=0.93)
         self.add_input("battery_efficiency", val=0.98)
         self.add_input("switch_efficiency", val=0.97)
@@ -28,8 +28,6 @@ class ComputeConverterMass(om.ExplicitComponent):
         self.add_input("bus_efficiency", val=0.97)
         self.add_input("converter_efficiency", val=0.97)
         self.add_input("cables_efficiency", val=0.99)
-        self.add_input("data:geometry:propulsion:fuelcell:stacks")  #### check input
-        self.add_input("data:geometry:propulsion:battery:stacks")  ### check input
         self.add_input("data:propulsion:converter:power_to_mass_ratio")  #### check input
 
         self.add_output(
@@ -50,13 +48,13 @@ class ComputeConverterMass(om.ExplicitComponent):
                                            inputs["mechanical_power"])
         max_power = max(mechanical_power_total) / 1000  # in [kW]
         electrical_power = max_power / total_efficiency
+        if any(ele > 1e6 for ele in electrical_power) == 1:
+            mass_inv_conv = 600
+        else:
+            powerToMassRatio = inputs[
+                "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [W/kg]
 
-        # NfuelCell = inputs["data:geometry:propulsion:fuelcell:stacks"]  # Number of fuel cell stacks
-        # Nbatt = inputs["data:geometry:propulsion:battery:stacks"]  # Number of battery stacks
-        powerToMassRatio = inputs[
-            "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [W/kg]
-
-        mass_inv_conv = electrical_power / powerToMassRatio
+            mass_inv_conv = electrical_power / powerToMassRatio
 
         outputs["converter_weight"] = mass_inv_conv
         outputs["data:geometry:propulsion:converter:weight"] = mass_inv_conv

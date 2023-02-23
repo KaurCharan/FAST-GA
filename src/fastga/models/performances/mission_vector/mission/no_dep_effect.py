@@ -162,6 +162,6 @@ class NoDEPEffect(om.ExplicitComponent):
 
         delta_Cd = delta_cd0 + delta_cdi
 
-        outputs["delta_Cl"] = delta_Cl
-        outputs["delta_Cd"] = delta_Cd
+        outputs["delta_Cl"] = 0
+        outputs["delta_Cd"] = 0
         outputs["delta_Cm"] = 0
