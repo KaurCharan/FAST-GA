@@ -78,4 +78,4 @@ class ComputeUnusableFuelWeight(ExplicitComponent):
             + 1.6 * n_tank * mfw ** 0.28
         )
 
-        outputs["data:weight:propulsion:unusable_fuel:mass"] = b3
+        outputs["data:weight:propulsion:unusable_fuel:mass"] = 0

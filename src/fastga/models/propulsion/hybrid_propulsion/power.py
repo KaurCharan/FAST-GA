@@ -79,6 +79,7 @@ class ComputePower(om.ExplicitComponent):
 
         self.add_output(
             "mechanical_power",
+            units = "W",
             val=np.full(number_of_points, 100),
             desc="mechanical power to be supplied by all motors",
         )
@@ -95,7 +96,7 @@ class ComputePower(om.ExplicitComponent):
         """
         # Include advance ratio loss in here, we will assume that since we work at constant RPM
         # the change in advance ration is equal to a change in
-        thrust = inputs["thrust_econ"]
+        thrust = np.clip(inputs["thrust_econ"], 1000, 5e4)
         altitude = inputs["altitude_econ"]
         true_airspeed = inputs["true_airspeed_econ"]
         cruise_altitude_propeller = inputs["data:aerodynamics:propeller:cruise_level:altitude"]
@@ -183,6 +184,8 @@ class ComputePower(om.ExplicitComponent):
                 thrust * true_airspeed / propeller_efficiency
         )
         mechanical_power_check = np.where(mechanical_power < 0, 0, mechanical_power)
+        print("thrust is", thrust)
         #mechanical_power_check = [150000 for i in range(252)]   ## TODO: comment when running full oad process
         #outputs["thrust_rate_t"] = np.zeros(252)
         outputs["mechanical_power"] = mechanical_power_check
+        print("power is ", mechanical_power_check)

@@ -84,7 +84,7 @@ class ComputeFuelLinesWeight(ExplicitComponent):
             * engine_nb ** 0.157
         )  # mass formula in lb
 
-        outputs["data:weight:propulsion:fuel_lines:mass"] = b2
+        outputs["data:weight:propulsion:fuel_lines:mass"] = 0
 
 
 @oad.RegisterSubmodel(
@@ -120,7 +120,7 @@ class ComputeFuelLinesWeightFLOPS(ExplicitComponent):
 
         b2 = 1.07 * fuel_mass ** 0.58 * engine_nb ** 0.43
 
-        outputs["data:weight:propulsion:fuel_lines:mass"] = b2
+        outputs["data:weight:propulsion:fuel_lines:mass"] = 0
 
     def compute_partials(self, inputs, partials, discrete_inputs=None):
 

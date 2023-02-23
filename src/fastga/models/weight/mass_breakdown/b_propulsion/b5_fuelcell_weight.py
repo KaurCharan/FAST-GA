@@ -41,6 +41,4 @@ class ComputeFuelCellWeight(ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["data:weight:propulsion:fuselage:fuelcell"] = (
-            inputs["data:geometry:propulsion:fuelcell:weight"]
-        )
+        outputs["data:weight:propulsion:fuselage:fuelcell"] = 0#(inputs["data:geometry:propulsion:fuelcell:weight"])

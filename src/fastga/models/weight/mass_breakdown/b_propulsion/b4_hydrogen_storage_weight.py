@@ -41,6 +41,4 @@ class ComputeHydrogenStorageWeight(ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
-        outputs["data:weight:propulsion:fuselage:H2_storage_mass"] = (
-            inputs["data:geometry:fuselage:H2_storage_mass"]
-        )
+        outputs["data:weight:propulsion:fuselage:H2_storage_mass"] = (inputs["data:geometry:fuselage:H2_storage_mass"])

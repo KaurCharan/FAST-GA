@@ -40,12 +40,12 @@ model:
             id: fastga.performances.mission_vector
             propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             out_file: D:/tmp/hybridelectric.csv
-        hq:
-            tail_sizing:
-                id: fastga.handling_qualities.tail_sizing
-                propulsion_id: fastga.wrapper.propulsion.basicIC_engine
-            static_margin:
-                id: fastga.handling_qualities.static_margin
+#        hq:
+#            tail_sizing:
+#                id: fastga.handling_qualities.tail_sizing
+#                propulsion_id: fastga.wrapper.propulsion.basicIC_engine
+#            static_margin:
+#                id: fastga.handling_qualities.static_margin
         wing_position:
             id: fastga.loop.wing_position
         wing_area:

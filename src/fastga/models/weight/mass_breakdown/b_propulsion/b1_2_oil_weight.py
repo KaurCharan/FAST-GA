@@ -58,4 +58,4 @@ class ComputeOilWeight(ExplicitComponent):
 
         b1_2 = 0.082 * n_eng * sl_thrust_lbs ** 0.65
 
-        outputs["data:weight:propulsion:engine_oil:mass"] = b1_2
+        outputs["data:weight:propulsion:engine_oil:mass"] = 0

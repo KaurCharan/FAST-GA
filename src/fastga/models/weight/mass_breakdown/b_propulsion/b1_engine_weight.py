@@ -58,7 +58,7 @@ class ComputeEngineWeight(ExplicitComponent):
 
         b1 = 1.4 * uninstalled_engine_weight
 
-        outputs["data:weight:propulsion:engine:mass"] = b1
+        outputs["data:weight:propulsion:engine:mass"] = 0
 
 
 @oad.RegisterSubmodel(
@@ -97,4 +97,4 @@ class ComputeEngineWeightRaymer(ExplicitComponent):
 
         b1 = 2.575 * uninstalled_engine_weight ** 0.922 * engine_count
 
-        outputs["data:weight:propulsion:engine:mass"] = b1
+        outputs["data:weight:propulsion:engine:mass"] = 0
