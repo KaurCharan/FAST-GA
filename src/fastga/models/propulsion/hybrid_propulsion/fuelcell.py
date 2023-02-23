@@ -29,9 +29,9 @@ class FuelcellParameters(om.ExplicitComponent):
         number_of_points = self.options["number_of_points"]
 
         self.add_input("mechanical_power", shape=number_of_points)
-        self.add_input("data:mission:sizing:takeoff:duration")
-        self.add_input("data:propulsion:fuelcell:current")  ##### check
-        self.add_input("data:propulsion:system_voltage")  ####
+        self.add_input("data:mission:sizing:takeoff:duration", units="s")
+        self.add_input("data:propulsion:fuelcell:current", units="A")  ##### check
+        self.add_input("data:propulsion:system_voltage", units="V")  ####
 
         self.add_input("fuelcell_efficiency", val=0.50)
         self.add_input("motor_efficiency", val=0.93)
@@ -237,6 +237,27 @@ class FuelcellParameters(om.ExplicitComponent):
         H2_volume_700bar = H2_mass * margin / H2_density_700bar
         H2_volume_liq = H2_mass * margin / H2_density_liq
 
+        if Cruise_Pelec_max <= 0:
+            FC_stack_mass = 1700
+            FC_stack_volume = 1
+            H2_mass = 60
+            H2_mass_array = [0.03 for i in range(252)]
+            Air_flow = 2
+            H2_volume_300bar = 1
+            H2_volume_700bar = 1
+            H2_volume_liq = 1
+            Cruise_stacks = 4
+
+        if FC_stack_mass > 1700:
+            FC_stack_mass = 1700
+            FC_stack_volume = 1.5
+            H2_mass = 60
+            H2_mass_array = [0.03 for i in range(252)]
+            Air_flow = 2
+            H2_volume_300bar = 1
+            H2_volume_700bar = 1
+            H2_volume_liq = 1
+            Cruise_stacks = 4
         # # Tank Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
         # H2tank_volume_300bar = H2_volume_300bar / H2_volumeEff_300bar
         # H2tank_volume_700bar = H2_volume_700bar / H2_volumeEff_700bar
