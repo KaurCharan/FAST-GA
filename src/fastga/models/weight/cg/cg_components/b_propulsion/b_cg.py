@@ -24,17 +24,47 @@ from .b5_fuelcell_cg import ComputeFuelCellCG #additional code
 
 from ..constants import SUBMODEL_PROPULSION_CG
 
-
 @oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga.submodel.weight.cg.propulsion.legacy")
 class FuelPropulsionCG(om.Group):
     def setup(self):
         self.add_subsystem("engine_cg", ComputeEngineCG(), promotes=["*"])
         self.add_subsystem("fuel_lines_cg", ComputeFuelLinesCG(), promotes=["*"])
         self.add_subsystem("propulsion_cg", ComputeFuelPropulsionCG(), promotes=["*"])
+
+class ComputeFuelPropulsionCG(om.ExplicitComponent):
+    def setup(self):
+        self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
+
+        self.add_input("data:weight:propulsion:engine:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:mass", units="kg", val=np.nan)
+
+        self.add_output("data:weight:propulsion:CG:x", units="m")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        engine_cg = inputs["data:weight:propulsion:engine:CG:x"]
+        fuel_lines_cg = inputs["data:weight:propulsion:fuel_lines:CG:x"]
+
+        engine_mass = inputs["data:weight:propulsion:engine:mass"]
+        fuel_lines_mass = inputs["data:weight:propulsion:fuel_lines:mass"]
+
+        cg_propulsion = (engine_cg * engine_mass + fuel_lines_cg * fuel_lines_mass) / (
+            engine_mass + fuel_lines_mass
+        )
+
+        outputs["data:weight:propulsion:CG:x"] = cg_propulsion
+
+@oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga.submodel.weight.cg.propulsion.hydrogenrear")
+class FuelPropulsionHydrogenRearCG(om.Group):
+    def setup(self):
+        self.add_subsystem("engine_cg", ComputeEngineCG(), promotes=["*"])
+        self.add_subsystem("fuel_lines_cg", ComputeFuelLinesCG(), promotes=["*"])
+        self.add_subsystem("propulsion_cg", ComputeFuelPropulsionHydrogenFuelCG(), promotes=["*"])
         self.add_subsystem("hydrogen_storage_cg", ComputeHydrogenStorageCG(), promotes=["*"]) #additional code
         self.add_subsystem("fuelcell_cg", ComputeFuelCellCG(), promotes=["*"]) #additional code
 
-class ComputeFuelPropulsionCG(om.ExplicitComponent):
+class ComputeFuelPropulsionHydrogenFuelCG(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
         self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
