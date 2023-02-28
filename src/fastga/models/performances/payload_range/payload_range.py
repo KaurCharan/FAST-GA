@@ -199,12 +199,12 @@ class ComputePayloadRange(om.ExplicitComponent):
 
         model.nonlinear_solver = om.NonlinearBlockGS()
         model.nonlinear_solver.options["iprint"] = 0
-        model.nonlinear_solver.options["maxiter"] = 10
+        model.nonlinear_solver.options["maxiter"] = 50
         model.nonlinear_solver.options["rtol"] = 1e-3
 
         model.linear_solver = om.LinearBlockGS()
         model.linear_solver.options["iprint"] = 0
-        model.linear_solver.options["maxiter"] = 10
+        model.linear_solver.options["maxiter"] = 50
         model.linear_solver.options["rtol"] = 1e-3
 
         problem.setup()

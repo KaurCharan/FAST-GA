@@ -86,8 +86,8 @@ class SystemsWeight(om.Group):
         self.nonlinear_solver.options["debug_print"] = True
         self.nonlinear_solver.options["err_on_non_converge"] = True
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["maxiter"] = 100
 
         self.linear_solver.options["err_on_non_converge"] = True
         self.linear_solver.options["iprint"] = 0
-        self.linear_solver.options["maxiter"] = 10
+        self.linear_solver.options["maxiter"] = 100

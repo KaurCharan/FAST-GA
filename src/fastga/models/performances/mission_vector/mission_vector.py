@@ -36,7 +36,7 @@ class MissionVector(om.Group):
         self.nonlinear_solver.options["debug_print"] = True
         self.nonlinear_solver.options["stall_limit"] = 10
         self.nonlinear_solver.options["stall_tol"] = 1e-2
-        self.nonlinear_solver.options["maxiter"] = 20
+        self.nonlinear_solver.options["maxiter"] = 100
         self.nonlinear_solver.options["rtol"] = 1e-5
         self.linear_solver = om.DirectSolver()
 

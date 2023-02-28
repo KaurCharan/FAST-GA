@@ -100,7 +100,7 @@ class NoDEPEffect(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         MTOW = inputs["data:weight:aircraft:MTOW"]
-        thrust = np.clip(inputs["thrust"], 0, None)
+        thrust = np.clip(inputs["thrust"], 0, 5e4)
         velocity = inputs["true_airspeed"]
         wing_area = inputs["data:geometry:wing:area"]
         wing_span = inputs["data:geometry:wing:span"]

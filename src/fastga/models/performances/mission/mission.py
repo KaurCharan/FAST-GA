@@ -119,7 +119,7 @@ class Mission(om.Group):
 
         # self.linear_solver.options["err_on_non_converge"] = True
         self.linear_solver.options["iprint"] = 0
-        self.linear_solver.options["maxiter"] = 10
+        self.linear_solver.options["maxiter"] = 100
         self.linear_solver.options["rtol"] = 1e-2
 
 
