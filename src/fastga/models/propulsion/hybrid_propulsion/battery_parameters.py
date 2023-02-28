@@ -124,7 +124,7 @@ class BatteryParameters(om.ExplicitComponent):
         # append power and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
         time_total = np.append(time_TO, time_step[0:100])
-        if all(electrical_power_total == 0) or (any(ele > 3e6 for ele in electrical_power_total) == 1):
+        if all(electrical_power_total <= 0) or (any(ele > 3e6 for ele in electrical_power_total) == 1):
             energy_consumed = np.zeros(252)
             dod = np.zeros(101)
             eff_bat = np.zeros(101)
