@@ -169,9 +169,9 @@ class DEPEquilibrium(om.Group):
         # Solver configuration
         self.nonlinear_solver.options["debug_print"] = False
         self.nonlinear_solver.options["iprint"] = 0
-        self.nonlinear_solver.options["maxiter"] = 50
-        self.nonlinear_solver.options["rtol"] = 1e-4
+        self.nonlinear_solver.options["maxiter"] = 100
+        self.nonlinear_solver.options["rtol"] = 1e-1
 
         self.linear_solver.options["iprint"] = 0
-        self.linear_solver.options["maxiter"] = 50
-        self.linear_solver.options["rtol"] = 1e-4
+        self.linear_solver.options["maxiter"] = 100
+        self.linear_solver.options["rtol"] = 1e-1
