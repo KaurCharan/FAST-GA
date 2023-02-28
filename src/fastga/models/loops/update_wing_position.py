@@ -30,7 +30,7 @@ class UpdateWingPosition(om.ExplicitComponent):
         self.add_input("data:weight:aircraft:CG:aft:MAC_position", val=np.nan)
         self.add_input("data:weight:aircraft:CG:aft:x", val=np.nan, units="m")
 
-        self.add_output("data:geometry:wing:MAC:at25percent:x", units="m")
+        self.add_output("data:geometry:wing:MAC:at25percent:x", val=3.5, units="m")
 
         self.declare_partials(of="*", wrt="*", method="fd")
 
@@ -47,5 +47,6 @@ class UpdateWingPosition(om.ExplicitComponent):
             - cg_ratio * l0_wing
             - (static_margin - target_static_margin) * l0_wing
         )
+        # mac_position = 6
 
         outputs["data:geometry:wing:MAC:at25percent:x"] = mac_position
