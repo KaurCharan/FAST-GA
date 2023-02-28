@@ -143,9 +143,11 @@ class FuelcellParameters(om.ExplicitComponent):
         mu_H2 = float(inputs["mu_H2"])
 
         mechanical_power = inputs["mechanical_power"]
+        print("power is ", mechanical_power)
         # power and time for cruise and climb
-        electrical_power_cruise_max = max(mechanical_power[100:200] / total_efficiency)
+        electrical_power_cruise_max = mechanical_power[100]/total_efficiency#max(mechanical_power[100:200] / total_efficiency)
         electrical_power_cruise = mechanical_power[100:200] / total_efficiency
+        print("fuel cruise power is", electrical_power_cruise)
         Cruise_Pelec_max = electrical_power_cruise_max
         Climb_Pelec = electrical_power_cruise_max
         TO_Pelec = electrical_power_cruise_max
@@ -237,7 +239,7 @@ class FuelcellParameters(om.ExplicitComponent):
         H2_volume_700bar = H2_mass * margin / H2_density_700bar
         H2_volume_liq = H2_mass * margin / H2_density_liq
 
-        if Cruise_Pelec_max <= 0:
+        if Cruise_Pelec_max <= 0 or FC_stack_mass > 1700:
             FC_stack_mass = 1700
             FC_stack_volume = 1
             H2_mass = 60
@@ -248,16 +250,6 @@ class FuelcellParameters(om.ExplicitComponent):
             H2_volume_liq = 1
             Cruise_stacks = 4
 
-        if FC_stack_mass > 1700:
-            FC_stack_mass = 1700
-            FC_stack_volume = 1.5
-            H2_mass = 60
-            H2_mass_array = [0.03 for i in range(252)]
-            Air_flow = 2
-            H2_volume_300bar = 1
-            H2_volume_700bar = 1
-            H2_volume_liq = 1
-            Cruise_stacks = 4
         # # Tank Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
         # H2tank_volume_300bar = H2_volume_300bar / H2_volumeEff_300bar
         # H2tank_volume_700bar = H2_volume_700bar / H2_volumeEff_700bar
@@ -281,6 +273,8 @@ class FuelcellParameters(om.ExplicitComponent):
         # data3 = {'H2tank_mass_300bar': H2tank_mass_300bar, 'H2tank_mass_700bar': \
         #     H2tank_mass_700bar, 'H2tank_mass_liq': H2tank_mass_liq}
         # print('Minimum H2 tank mass is of: ', min(data3, key=data3.get))
+
+        print("max fuelcell power is", Cruise_Pelec_max)
 
         outputs["fuelcell_Pelec_max"] = float(Cruise_Pelec_max)
         outputs["fuelcell_weight"] = float(FC_stack_mass)

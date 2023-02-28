@@ -83,7 +83,6 @@ class ComputePower(om.ExplicitComponent):
             val=np.full(number_of_points, 100),
             desc="mechanical power to be supplied by all motors",
         )
-        #self.add_output("thrust_rate_t", val=0, shape=number_of_points)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         _LOGGER.debug("Calculating shaft power")
@@ -188,4 +187,4 @@ class ComputePower(om.ExplicitComponent):
         #mechanical_power_check = [150000 for i in range(252)]   ## TODO: comment when running full oad process
         #outputs["thrust_rate_t"] = np.zeros(252)
         outputs["mechanical_power"] = mechanical_power_check
-        print("power is ", mechanical_power_check)
+        #print("power is ", mechanical_power_check)
