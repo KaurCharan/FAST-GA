@@ -1,7 +1,7 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">8.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <NPAX_design is_input="True">10.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">150.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">270<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">118.0<!--top-level requirement: approach speed--></v_approach>
@@ -66,7 +66,7 @@
         <luggage_length units="m" is_input="True">0.8<!--length of the luggage compartment--></luggage_length>
         <maximum_height units="m" is_input="True">1.62<!--maximum fuselage height--></maximum_height>
         <maximum_width units="m" is_input="True">1.36<!--maximum fuselage width--></maximum_width>
-        <rear_length units="m" is_input="True">3.74<!--length of the rear cone of the aircraft--></rear_length>
+        <rear_length units="m" is_input="True">5.0<!--length of the rear cone of the aircraft--></rear_length>
         <number_of_inlets is_input="True">2.0<!--number of inlets needed for the fuel-cell--></number_of_inlets>
         <number_of_tank is_input="True">1.0<!--number of hydrogen storage/tank--></number_of_tank>
       </fuselage>
@@ -75,12 +75,12 @@
         <aspect_ratio is_input="True">5.01<!--horizontal tail aspect ratio--></aspect_ratio>
         <elevator_chord_ratio is_input="True">0.39<!--elevator chord ratio--></elevator_chord_ratio>
         <sweep_25 units="deg" is_input="True">0.0<!--sweep angle at 25% chord of horizontal tail--></sweep_25>
-        <taper_ratio is_input="True">0.7<!--taper ratio of horizontal tail--></taper_ratio>
+        <taper_ratio is_input="True">1.0<!--taper ratio of horizontal tail--></taper_ratio>
         <thickness_ratio is_input="True">0.12<!--thickness ratio of horizontal tail--></thickness_ratio>
         <MAC>
           <at25percent>
             <x>
-              <absolute units="m" is_input="True">5.54<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></absolute>
+              <absolute units="m" is_input="True">20.0<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></absolute>
               <from_wingMAC25 units="m" is_input="True">10<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></from_wingMAC25>
             </x>
           </at25percent>
@@ -117,7 +117,7 @@
         <MAC>
           <at25percent>
             <x>
-              <absolute units="m" is_input="True">5.54<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></absolute>
+              <absolute units="m" is_input="True">17.0<!--distance along X between 25% MAC of wing and 25% MAC of horizontal tail--></absolute>
               <from_wingMAC25 units="m" is_input="True">10<!--distance along X between 25% MAC of wing and 25% MAC of vertical tail--></from_wingMAC25>
             </x>
           </at25percent>
@@ -176,8 +176,9 @@
         <efficiency is_input="True">0.95<!-- desired efficiency of bus--></efficiency>
       </bus>
       <converter>
-        <efficiency is_input="True">0.90<!-- desired efficiency of converter--></efficiency>
-        <power_to_mass_ratio is_input="True">10<!-- power to mass ratio of converter--></power_to_mass_ratio>
+        <efficiency is_input="True">0.97<!-- desired efficiency of converter--></efficiency>
+        <power_to_mass_ratio is_input="True">40
+          <!-- power to mass ratio of converter--></power_to_mass_ratio>
       </converter>
       <fuelcell>
         <current units="A" is_input="True">100<!-- desired cell current for fuelcell operation--></current>
@@ -310,7 +311,7 @@
       <aircraft>
         <MLW_MZFW_ratio is_input="True">1.16</MLW_MZFW_ratio>
         <CG>
-          <range is_input="True">0.23<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
+          <range is_input="True">0.15<!--distance between front position and aft position of CG, as ratio of mean aerodynamic chord (allows to have front position of CG, as currently, FAST-OAD estimates only the aft position of CG)--></range>
           <aft>
             <MAC_position>
               <margin is_input="True">0.0<!--Added margin for getting most aft CG position, as ratio of mean aerodynamic chord--></margin>
@@ -340,7 +341,7 @@
         </fuselage>
         <landing_gear>
           <front>
-            <weight_ratio is_input="True">0.24<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
+            <weight_ratio is_input="True">0.1<!--part of aircraft weight that is supported by front landing gear--></weight_ratio>
           </front>
         </landing_gear>
       </airframe>

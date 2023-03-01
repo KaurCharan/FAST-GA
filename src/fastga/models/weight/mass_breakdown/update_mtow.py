@@ -30,6 +30,7 @@ class UpdateMTOW(ExplicitComponent):
     def setup(self):
         self.add_input("data:weight:aircraft:ZFW", val=np.nan, units="kg")
         self.add_input("data:mission:sizing:fuel", val=np.nan, units="kg")
+        self.add_input("data:geometry:propulsion:hydrogen:weight", units="kg")
 
         self.add_output("data:weight:aircraft:MTOW", 6000.0, units="kg")
 
@@ -37,7 +38,7 @@ class UpdateMTOW(ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         zfw = inputs["data:weight:aircraft:ZFW"]
-        m_fuel = inputs["data:mission:sizing:fuel"]
+        m_fuel = inputs["data:geometry:propulsion:hydrogen:weight"]
 
         mtow = zfw + m_fuel
 

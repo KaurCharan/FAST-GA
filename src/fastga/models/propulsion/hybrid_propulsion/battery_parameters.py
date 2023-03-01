@@ -110,7 +110,6 @@ class BatteryParameters(om.ExplicitComponent):
         mechanical_power_climb = mechanical_power[0:100]
         electrical_power = list(range(len(mechanical_power_climb)))
         electrical_power_climb = mechanical_power_climb / total_efficiency
-        weight_cells=0
         for idx in range(np.size(electrical_power_climb)):
             if electrical_power_climb[idx] > fuelcell_Pelec_max:
                 electrical_power[idx] = float(abs(electrical_power_climb[idx] - fuelcell_Pelec_max))
@@ -143,9 +142,6 @@ class BatteryParameters(om.ExplicitComponent):
             extra = [0.0 for i in range(152)]
             #energy_consumed = np.concatenate((Q_used[1:101], extra))
             energy_consumed = np.zeros(252)
-        print("total battery cells weight is", weight_cells)
-        print("total battery pack weight is", weight_BatteryPack)
-        print("number of modules in parallel", n_parallel)
         outputs["non_consumable_energy_t_econ"] = energy_consumed
         outputs["data:propulsion:battery:dod"] = dod
         outputs["data:geometry:propulsion:battery:n_parallel"] = n_parallel
@@ -154,4 +150,3 @@ class BatteryParameters(om.ExplicitComponent):
         outputs["battery_weight"] = weight_BatteryPack
         outputs["data:geometry:propulsion:battery:volume"] = volume_BatteryPack
         outputs["data:propulsion:battery:efficiency_out"] = eff_bat
-        print("hehe")

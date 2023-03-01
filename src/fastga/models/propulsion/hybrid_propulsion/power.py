@@ -182,9 +182,8 @@ class ComputePower(om.ExplicitComponent):
         mechanical_power = (
                 thrust * true_airspeed / propeller_efficiency
         )
-        mechanical_power_check = np.where(mechanical_power < 0, 0, mechanical_power)
-        print("thrust is", thrust)
+        print("power is", mechanical_power)
         #mechanical_power_check = [150000 for i in range(252)]   ## TODO: comment when running full oad process
-        #outputs["thrust_rate_t"] = np.zeros(252)
-        outputs["mechanical_power"] = mechanical_power_check
-        #print("power is ", mechanical_power_check)
+
+        outputs["mechanical_power"] = mechanical_power
+

@@ -476,5 +476,4 @@ class Equilibrium(om.ImplicitComponent):
             + (x_cg - x_htp) * cl_htp
             + (cm0_wing + delta_cm + delta_cm_flaps + cm_alpha_fus * alpha) * l0_wing
         )
-        print("alpha is", alpha)
-        print("residuals is", residuals["alpha"])
+

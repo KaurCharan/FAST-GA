@@ -47,6 +47,5 @@ class UpdateWingPosition(om.ExplicitComponent):
             - cg_ratio * l0_wing
             - (static_margin - target_static_margin) * l0_wing
         )
-        # mac_position = 6
 
         outputs["data:geometry:wing:MAC:at25percent:x"] = mac_position

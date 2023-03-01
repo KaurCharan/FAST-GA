@@ -54,30 +54,22 @@ class BatteryModel:
         t_duration = self.time_input  # input time duration [seconds]
 
         ## initial voltage estimation of a battery module
-        # Q_pack = W_total * rho_bat / n_pack / vol_elecSys   # Capacity of battery pack
         Vb_est = np.zeros(len(Power))  # estimated voltage of a module
         Q_used = np.zeros(len(Power))
         Vc = np.zeros(len(Power))
         Voc = V_cell
         del_V = np.zeros(len(Power))
-        #P_in = np.zeros(len(Power))
-        #t = np.zeros(len(Power))
         del_V[0] = 0
         Ib = np.zeros(len(Power))
         eff_bat = np.zeros(len(Power))
         C_rate = np.zeros(len(Power))
         dod = np.zeros(len(Power))
-        V_end = 0
-        dod_sum = 0
-        Q_sum = 0
-        del_V_sum = 0
         dod[0] = 0
         R = 0
         C = 0
         i = 0
 
         t = t_duration / 60 / 60
-        time_sum = sum(t_duration[1:101])
         P_in = Power
         n_series = vol_elecSys // V_nom + 1  # number of cells in series in a module
         if i == 0:
@@ -86,7 +78,6 @@ class BatteryModel:
 
             else:
                 n_parallel = (Power[i]) // (Q_rat * vol_elecSys * C_max)  # initial estimate of modules in parallel
-                print("initial value of n_parallel", n_parallel)
 
         while i < len(t_duration):
             Pb = 0
@@ -191,22 +182,16 @@ class BatteryModel:
                         C = Ib[i] / Q_rat
                         Pb = Vc[i] * Ib[i] * n_series * n_parallel  # calculated power of pack
 
-                #del_V[i] = 4.2 - Vc[i]
                 Q_used[i] = Ib[i] * t[i]  # [Ah]
                 C_rate[i] = C  # discharge rate
                 dod[i] = Ib[i] * t[i] * 100 / Q_rat
                 eff_bat[i] = 1 - Ib[i] * R / Voc
                 i = i + 1
 
-        # n = Q_remain / Q_rat
         if n_parallel > 600:
             print("n_parallel greater than 600")
+        Q_sum = sum(Q_used)
         weight = n_parallel * n_series * cell_mass
-        print("voltage is", np.ndarray.tolist(Vc))
-        print("power for battery is", np.ndarray.tolist(Power))
-        print("time is", np.ndarray.tolist(t_duration))
-        print("weight is ", weight)
-        print("cells in parallel", n_parallel)
         return weight, n_series, n_parallel, dod, eff_bat, Q_used
 
     def compute_weight(self, weight_cells):

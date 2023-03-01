@@ -30,8 +30,8 @@ class FuelcellParameters(om.ExplicitComponent):
 
         self.add_input("mechanical_power", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:duration", units="s")
-        self.add_input("data:propulsion:fuelcell:current", units="A")  ##### check
-        self.add_input("data:propulsion:system_voltage", units="V")  ####
+        self.add_input("data:propulsion:fuelcell:current", units="A")
+        self.add_input("data:propulsion:system_voltage", units="V")
 
         self.add_input("fuelcell_efficiency", val=0.50)
         self.add_input("motor_efficiency", val=0.93)
@@ -95,13 +95,13 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_output("fuelcell_Pelec_max", shape=1)
         self.add_output("fuel_consumed_t_econ", val=0, shape=number_of_points)
         self.add_output("data:geometry:propulsion:fuelcell:stacks", shape=1)
-        self.add_output("data:geometry:propulsion:fuelcell:weight", shape=1)
-        self.add_output("data:geometry:propulsion:fuelcell:volume", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:weight", shape=1)
+        self.add_output("data:geometry:propulsion:fuelcell:weight", units="kg", shape=1)
+        self.add_output("data:geometry:propulsion:fuelcell:volume", units="m**3", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:weight", units="kg", shape=1)
         self.add_output("data:geometry:propulsion:fuelcell:air_flow", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:volume_300bar", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:volume_700bar", shape=1)
-        self.add_output("data:geometry:propulsion:hydrogen:volume_liquid", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:volume_300bar", units="m**3", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:volume_700bar", units="m**3", shape=1)
+        self.add_output("data:geometry:propulsion:hydrogen:volume_liquid", units="m**3", shape=1)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         _LOGGER.debug("Calculating fuelcell parameters")
@@ -143,11 +143,9 @@ class FuelcellParameters(om.ExplicitComponent):
         mu_H2 = float(inputs["mu_H2"])
 
         mechanical_power = inputs["mechanical_power"]
-        print("power is ", mechanical_power)
         # power and time for cruise and climb
-        electrical_power_cruise_max = mechanical_power[100]/total_efficiency#max(mechanical_power[100:200] / total_efficiency)
+        electrical_power_cruise_max = max(mechanical_power[100:200] / total_efficiency)
         electrical_power_cruise = mechanical_power[100:200] / total_efficiency
-        print("fuel cruise power is", electrical_power_cruise)
         Cruise_Pelec_max = electrical_power_cruise_max
         Climb_Pelec = electrical_power_cruise_max
         TO_Pelec = electrical_power_cruise_max
@@ -249,32 +247,6 @@ class FuelcellParameters(om.ExplicitComponent):
             H2_volume_700bar = 1
             H2_volume_liq = 1
             Cruise_stacks = 4
-
-        # # Tank Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
-        # H2tank_volume_300bar = H2_volume_300bar / H2_volumeEff_300bar
-        # H2tank_volume_700bar = H2_volume_700bar / H2_volumeEff_700bar
-        # H2tank_volume_liq = H2_volume_liq / H2_volumeEff_liq
-        # data1 = {'H2tank_volume_300bar': H2tank_volume_300bar, 'H2tank_volume_700bar': \
-        #     H2tank_volume_700bar, 'H2tank_volume_liq': H2tank_volume_liq}
-        # print('Minimum H2 tank volume is of: ', min(data1, key=data1.get))
-        #
-        # # Length of hydrogen tank for 300 bar, 700 bar and liquid form [m]
-        # H2tank_length_300bar = H2tank_volume_300bar / (np.pi * (fus_dia / 2) ** 2)
-        # H2tank_length_700bar = H2tank_volume_700bar / (np.pi * (fus_dia / 2) ** 2)
-        # H2tank_length_liq = H2tank_volume_liq / (np.pi * (fus_dia / 2) ** 2)
-        # data2 = {'H2tank_length_300bar': H2tank_length_300bar, 'H2tank_length_700bar': \
-        #     H2tank_length_700bar, 'H2tank_length_liq': H2tank_length_liq}
-        # print('Minimum H2 tank length is of: ', min(data2, key=data2.get))
-        #
-        # # Mass of hydrogen tank for 300 bar, 700 bar and liquid form [kg]
-        # H2tank_mass_300bar = (H2_mass * margin / H2_storageEff_300bar) - H2_mass * margin
-        # H2tank_mass_700bar = (H2_mass * margin / H2_storageEff_700bar) - H2_mass * margin
-        # H2tank_mass_liq = (H2_mass * margin / H2_storageEff_liq) - H2_mass * margin
-        # data3 = {'H2tank_mass_300bar': H2tank_mass_300bar, 'H2tank_mass_700bar': \
-        #     H2tank_mass_700bar, 'H2tank_mass_liq': H2tank_mass_liq}
-        # print('Minimum H2 tank mass is of: ', min(data3, key=data3.get))
-
-        print("max fuelcell power is", Cruise_Pelec_max)
 
         outputs["fuelcell_Pelec_max"] = float(Cruise_Pelec_max)
         outputs["fuelcell_weight"] = float(FC_stack_mass)
