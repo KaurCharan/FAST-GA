@@ -36,7 +36,7 @@ class ComputeWingToc(om.ExplicitComponent):
         self.add_output("data:geometry:wing:kink:thickness_ratio")
         self.add_output("data:geometry:wing:tip:thickness_ratio")
 
-        self.declare_partials("", "", method="fd")
+        self.declare_partials("*", "*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
@@ -52,7 +52,7 @@ class ComputeWingToc(om.ExplicitComponent):
 
 
 @oad.RegisterSubmodel(
-    SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC, "fastga.submodel.geometry.wing.thickness_ratio.electric"
+    SUBMODEL_WING_THICKNESS_RATIO_LEGACY, "fastga.submodel.geometry.wing.thickness_ratio.electric"
 )
 class ComputeWingTocElectric(om.ExplicitComponent):
     # TODO: Document hypothesis. Cite sources

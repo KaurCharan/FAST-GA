@@ -39,7 +39,7 @@ class ComputeWingGeometry(Group):
     def setup(self):
         self.add_subsystem(
             "wing_toc",
-            oad.RegisterSubmodel.get_submodel(SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC),
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_WING_THICKNESS_RATIO_LEGACY),
             promotes=["*"],
         )
         self.add_subsystem(
