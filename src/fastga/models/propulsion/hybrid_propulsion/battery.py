@@ -147,6 +147,7 @@ class BatteryModel:
                         Ib = np.zeros(len(Power))
                         Q_used = np.zeros(len(Power))
                         i = 0
+                        _LOGGER.debug("batteries in parallel increased")
 
                     if P_in[i] == 0:
                         Ib[i] = 0

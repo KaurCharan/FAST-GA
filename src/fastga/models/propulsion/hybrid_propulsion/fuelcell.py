@@ -33,14 +33,14 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_input("data:propulsion:fuelcell:current", units="A")
         self.add_input("data:propulsion:system_voltage", units="V")
 
-        self.add_input("fuelcell_efficiency", val=0.50)
-        self.add_input("motor_efficiency", val=0.93)
-        self.add_input("switch_efficiency", val=0.97)
-        self.add_input("gearbox_efficiency", val=0.98)
-        self.add_input("controller_efficiency", val=0.97)
-        self.add_input("bus_efficiency", val=0.97)
-        self.add_input("converter_efficiency", val=0.97)
-        self.add_input("cables_efficiency", val=0.99)
+        self.add_input("data:propulsion:fuelcell:efficiency", val=0.50)
+        self.add_input("data:propulsion:motor:efficiency", val=0.93)
+        self.add_input("data:propulsion:switch:efficiency", val=0.97)
+        self.add_input("data:propulsion:gearbox:efficiency", val=0.98)
+        self.add_input("data:propulsion:controller:efficiency", val=0.97)
+        self.add_input("data:propulsion:bus:efficiency", val=0.97)
+        self.add_input("data:propulsion:converter:efficiency", val=0.97)
+        self.add_input("data:propulsion:cables:efficiency", val=0.99)
 
         self.add_input("P_oper", val=1.0)
         self.add_input("P_nom", val=1.0)
@@ -57,7 +57,7 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_input("H2_volumeEff_300bar", val=0.50)
         self.add_input("H2_volumeEff_700bar", val=0.50)
         self.add_input("H2_volumeEff_liq", val=0.50)
-        self.add_input("margin", val=1.30)
+        self.add_input("margin", val=1.20)
         # PEM FC paramters
         self.add_input("V_thermo", val=1.22)
         self.add_input("Top", val=323.15)
@@ -105,12 +105,14 @@ class FuelcellParameters(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         _LOGGER.debug("Calculating fuelcell parameters")
-        total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
-                           * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \
-                           inputs["cables_efficiency"]
+        total_efficiency = inputs["data:propulsion:motor:efficiency"] * inputs["data:propulsion:gearbox:efficiency"] \
+                           * inputs["data:propulsion:controller:efficiency"] \
+                           * inputs["data:propulsion:switch:efficiency"] * inputs["data:propulsion:bus:efficiency"] \
+                            * inputs["data:propulsion:converter:efficiency"] \
+                           * inputs["data:propulsion:cables:efficiency"]
 
         time_step = inputs["time_step_econ"]
-        FCeff = inputs["fuelcell_efficiency"]
+        FCeff = inputs["data:propulsion:fuelcell:efficiency"]
         cell_current = inputs["data:propulsion:fuelcell:current"]
         V_max = inputs["data:propulsion:system_voltage"]
         P_oper = inputs["P_oper"]
@@ -162,6 +164,11 @@ class FuelcellParameters(om.ExplicitComponent):
         Taxi_Pelec = 0#mechanical_power[250:252] / total_efficiency
         Descent_time = time_step[200:250]
         Taxi_time = time_step[250:252]
+
+        Climb_time_sum = sum(Climb_time)
+        Cruise_time_sum = sum(Cruise_time)
+        Descent_time_sum = sum(Descent_time)
+        print("climb, cruise, descent time are", Climb_time_sum, Cruise_time_sum, Descent_time_sum)
 
         # fus_dia = inputs["data:geometry:fuselage:length"]
         I = list(range(0, 210, 10))  # Current [A]

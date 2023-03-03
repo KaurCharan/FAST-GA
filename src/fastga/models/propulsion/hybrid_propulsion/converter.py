@@ -20,14 +20,14 @@ class ComputeConverterMass(om.ExplicitComponent):
 
         self.add_input("mechanical_power", units="W", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power", units="W")
-        self.add_input("motor_efficiency", val=0.93)
-        self.add_input("battery_efficiency", val=0.98)
-        self.add_input("switch_efficiency", val=0.97)
-        self.add_input("gearbox_efficiency", val=0.98)
-        self.add_input("controller_efficiency", val=0.97)
-        self.add_input("bus_efficiency", val=0.97)
-        self.add_input("converter_efficiency", val=0.97)
-        self.add_input("cables_efficiency", val=0.99)
+        self.add_input("data:propulsion:motor:efficiency", val=0.93)
+        self.add_input("data:propulsion:battery:efficiency", val=0.93)
+        self.add_input("data:propulsion:switch:efficiency", val=0.97)
+        self.add_input("data:propulsion:gearbox:efficiency", val=0.98)
+        self.add_input("data:propulsion:controller:efficiency", val=0.97)
+        self.add_input("data:propulsion:bus:efficiency", val=0.97)
+        self.add_input("data:propulsion:converter:efficiency", val=0.97)
+        self.add_input("data:propulsion:cables:efficiency", val=0.99)
         self.add_input("data:propulsion:converter:power_to_mass_ratio")  #### check input
 
         self.add_output(
@@ -40,10 +40,12 @@ class ComputeConverterMass(om.ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         _LOGGER.debug("Calculating converter parameters")
-        total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
-                           * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"]
+        total_efficiency = inputs["data:propulsion:motor:efficiency"] * inputs["data:propulsion:gearbox:efficiency"] \
+                           * inputs["data:propulsion:controller:efficiency"] \
+                           * inputs["data:propulsion:switch:efficiency"] * inputs["data:propulsion:bus:efficiency"] \
+                           * inputs["data:propulsion:converter:efficiency"]
 
-        # Power supplied to DC-DC converter [W]
+            # Power supplied to DC-DC converter [W]
         mechanical_power_total = np.append(np.array(inputs["data:mission:sizing:takeoff:power"]),
                                            inputs["mechanical_power"])
         max_power = max(mechanical_power_total) / 1000  # in [kW]

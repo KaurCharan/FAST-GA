@@ -3,6 +3,7 @@ import fastoad.api as oad
 import numpy as np
 import openmdao.api as om
 from fastga.models.propulsion.hybrid_propulsion.constants import SUBMODEL_MOTOR_MASS
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -14,6 +15,7 @@ class ComputeMotorMass(om.ExplicitComponent):
     """Estimation on motor mass [kg] based on maximum power required from motor
        Based on:
     """
+
     def initialize(self):
         self.options.declare(
             "number_of_points", default=252, desc="number of equilibrium to be treated"
@@ -24,7 +26,7 @@ class ComputeMotorMass(om.ExplicitComponent):
 
         self.add_input("mechanical_power", units="W", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power", units="W")
-        self.add_input("motor_efficiency", val=0.93)
+        self.add_input("data:propulsion:motor:efficiency", val=0.93)
         self.add_input("data:propulsion:motor:number", val=8, desc="number of motors")  #### check input
         self.add_output(
             "motor_weight",
@@ -39,7 +41,8 @@ class ComputeMotorMass(om.ExplicitComponent):
         mechanical_power_total = np.append(np.array(inputs["data:mission:sizing:takeoff:power"]),
                                            inputs["mechanical_power"])
         max_power = max(mechanical_power_total) / 1000  # in [kW]
-        electrical_power = max_power / inputs["motor_efficiency"] / inputs["data:propulsion:motor:number"]
+        electrical_power = max_power / inputs["data:propulsion:motor:efficiency"] / inputs[
+            "data:propulsion:motor:number"]
         if any(ele > 1e6 for ele in electrical_power) == 1:
             mass_motor = 300
         else:

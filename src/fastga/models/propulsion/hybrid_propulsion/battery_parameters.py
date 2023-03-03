@@ -41,14 +41,14 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_input("data:mission:sizing:takeoff:power", units="W")
         self.add_input("data:mission:sizing:takeoff:duration", units="s")
         self.add_input("fuelcell_Pelec_max", units="W")
-        self.add_input("motor_efficiency", val=0.93)
-        self.add_input("battery_efficiency", val=0.98)
-        self.add_input("switch_efficiency", val=0.97)
-        self.add_input("gearbox_efficiency", val=0.98)
-        self.add_input("controller_efficiency", val=0.97)
-        self.add_input("bus_efficiency", val=0.97)
-        self.add_input("converter_efficiency", val=0.97)
-        self.add_input("cables_efficiency", val=0.99)
+        self.add_input("data:propulsion:motor:efficiency", val=0.93)
+        self.add_input("battery_efficiency", val=0.93)
+        self.add_input("data:propulsion:switch:efficiency", val=0.97)
+        self.add_input("data:propulsion:gearbox:efficiency", val=0.98)
+        self.add_input("data:propulsion:controller:efficiency", val=0.97)
+        self.add_input("data:propulsion:bus:efficiency", val=0.97)
+        self.add_input("data:propulsion:converter:efficiency", val=0.97)
+        self.add_input("data:propulsion:cables:efficiency", val=0.99)
 
         self.add_input(
             "time_step_econ",
@@ -95,12 +95,15 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_output("data:geometry:propulsion:battery:n_parallel")
         self.add_output("data:geometry:propulsion:battery:n_series")
         self.add_output("data:propulsion:battery:efficiency_out", val=0, shape=101)
+        self.add_output("data:propulsion:battery:efficiency", val=0.93, shape=1)
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         _LOGGER.debug("Calculating battery parameters")
-        total_efficiency = inputs["motor_efficiency"] * inputs["gearbox_efficiency"] * inputs["controller_efficiency"] \
-                           * inputs["switch_efficiency"] * inputs["bus_efficiency"] * inputs["converter_efficiency"] * \
-                           inputs["cables_efficiency"] * inputs["battery_efficiency"]
+        total_efficiency = inputs["data:propulsion:motor:efficiency"] * inputs["data:propulsion:gearbox:efficiency"] \
+                           * inputs["data:propulsion:controller:efficiency"] \
+                           * inputs["data:propulsion:switch:efficiency"] * inputs["data:propulsion:bus:efficiency"] \
+                            * inputs["data:propulsion:converter:efficiency"] \
+                           * inputs["data:propulsion:cables:efficiency"] * inputs["battery_efficiency"]
 
         fuelcell_Pelec_max = inputs["fuelcell_Pelec_max"]
         time_step = inputs["time_step_econ"]
@@ -131,6 +134,7 @@ class BatteryParameters(om.ExplicitComponent):
             weight_BatteryPack = 980
             n_series = 0
             n_parallel = 0
+            battery_eff_avg = 0.93
             _LOGGER.debug("Skipped battery model")
         else:
             battery_model = BatteryModel(electrical_power_total, time_total)
@@ -139,6 +143,7 @@ class BatteryParameters(om.ExplicitComponent):
             weight_cells, n_series, n_parallel, dod, eff_bat, Q_used= battery_model.compute_soc()
             weight_BatteryPack = battery_model.compute_weight(weight_cells)
             volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
+            battery_eff_avg = np.average(eff_bat)
             extra = [0.0 for i in range(152)]
             #energy_consumed = np.concatenate((Q_used[1:101], extra))
             energy_consumed = np.zeros(252)
@@ -150,3 +155,4 @@ class BatteryParameters(om.ExplicitComponent):
         outputs["battery_weight"] = weight_BatteryPack
         outputs["data:geometry:propulsion:battery:volume"] = volume_BatteryPack
         outputs["data:propulsion:battery:efficiency_out"] = eff_bat
+        outputs["data:propulsion:battery:efficiency"] = battery_eff_avg
