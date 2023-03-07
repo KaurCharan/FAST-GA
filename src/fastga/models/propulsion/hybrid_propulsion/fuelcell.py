@@ -42,7 +42,7 @@ class FuelcellParameters(om.ExplicitComponent):
         self.add_input("data:propulsion:converter:efficiency", val=0.97)
         self.add_input("data:propulsion:cables:efficiency", val=0.99)
 
-        self.add_input("P_oper", val=1.0)
+        self.add_input("P_oper", val=0.753)
         self.add_input("P_nom", val=1.0)
         self.add_input("single_stack_mass", val=42.0)
         self.add_input("single_stack_volume", val=0.03721536)  # in m3

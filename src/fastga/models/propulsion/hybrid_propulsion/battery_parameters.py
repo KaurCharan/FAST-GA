@@ -40,6 +40,7 @@ class BatteryParameters(om.ExplicitComponent):
         self.add_input("mechanical_power", units="W", shape=number_of_points)
         self.add_input("data:mission:sizing:takeoff:power", units="W")
         self.add_input("data:mission:sizing:takeoff:duration", units="s")
+        self.add_input("data:propulsion:system_voltage", units="V")
         self.add_input("fuelcell_Pelec_max", units="W")
         self.add_input("data:propulsion:motor:efficiency", val=0.93)
         self.add_input("battery_efficiency", val=0.93)
@@ -105,6 +106,7 @@ class BatteryParameters(om.ExplicitComponent):
                             * inputs["data:propulsion:converter:efficiency"] \
                            * inputs["data:propulsion:cables:efficiency"] * inputs["battery_efficiency"]
 
+        voltage = inputs["data:propulsion:system_voltage"]
         fuelcell_Pelec_max = inputs["fuelcell_Pelec_max"]
         time_step = inputs["time_step_econ"]
         time_TO = np.array(inputs["data:mission:sizing:takeoff:duration"])
@@ -137,10 +139,10 @@ class BatteryParameters(om.ExplicitComponent):
             battery_eff_avg = 0.93
             _LOGGER.debug("Skipped battery model")
         else:
-            battery_model = BatteryModel(electrical_power_total, time_total)
+            battery_model = BatteryModel(electrical_power_total, time_total, voltage)
 
             # storing parameters
-            weight_cells, n_series, n_parallel, dod, eff_bat, Q_used= battery_model.compute_soc()
+            weight_cells, n_series, n_parallel, dod, eff_bat, Q_used = battery_model.compute_soc()
             weight_BatteryPack = battery_model.compute_weight(weight_cells)
             volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
             battery_eff_avg = np.average(eff_bat)

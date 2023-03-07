@@ -22,10 +22,12 @@ class BatteryModel:
     def __init__(
             self,
             power,
-            time
+            time,
+            voltage
     ):
         self.power_input = power
         self.time_input = time
+        self.voltage_input = voltage
 
     def compute_soc(self):
         _LOGGER.debug("Inside battery model")
@@ -39,7 +41,7 @@ class BatteryModel:
         """
         global R, C
         rho_cell = 240  # specific energy [Wh/kg]
-        vol_elecSys = 500  # system operating voltage [Volt]
+        vol_elecSys = self.voltage_input  # system operating voltage [Volt]
         V_cell = 3.3  # single cell nominal voltage [Volt] !!fixed!!
         V_nom = 3.6
         V_cell_max = 4.2  # single cell max voltage [Volt]
