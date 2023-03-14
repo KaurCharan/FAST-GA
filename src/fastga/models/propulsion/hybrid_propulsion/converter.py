@@ -54,7 +54,7 @@ class ComputeConverterMass(om.ExplicitComponent):
             mass_inv_conv = 600
         else:
             powerToMassRatio = inputs[
-                "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [W/kg]
+                "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [kW/kg]
 
             mass_inv_conv = electrical_power / powerToMassRatio
 

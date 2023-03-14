@@ -1,7 +1,7 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">14.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <NPAX_design is_input="True">13.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">150.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">270<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">118.0<!--top-level requirement: approach speed--></v_approach>
@@ -44,7 +44,7 @@
         </luggage>
         <seats>
           <passenger>
-            <NPAX_max is_input="True">14.0<!--maximum seating capability of the aircraft--></NPAX_max>
+            <NPAX_max is_input="True">13.0<!--maximum seating capability of the aircraft--></NPAX_max>
             <count_by_row is_input="True">2.0<!--passenger seats per row--></count_by_row>
             <length units="m" is_input="True">0.89<!--passenger seats length--></length>
             <width units="m" is_input="True">0.58<!--passenger seats width--></width>
@@ -177,7 +177,7 @@
       </bus>
       <converter>
         <efficiency is_input="True">0.97<!-- desired efficiency of converter--></efficiency>
-        <power_to_mass_ratio is_input="True">40<!-- power to mass ratio of converter--></power_to_mass_ratio>
+        <power_to_mass_ratio is_input="True">10<!-- power to mass ratio of converter--></power_to_mass_ratio>
       </converter>
       <fuelcell>
         <current units="A" is_input="True">150<!-- desired cell current for fuelcell operation--></current>
@@ -220,7 +220,7 @@
         </initial_climb>
         <takeoff>
           <duration units="s" is_input="False">150</duration>
-          <power units="W" is_input="False">900000</power>
+          <power units="W" is_input="False">950000</power>
           <energy units="W*h" is_input="False">0.0</energy>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
           <friction_coefficient_no_brake is_input="True">0.03<!--friction coefficient used during the computation of the takeoff phase--></friction_coefficient_no_brake>

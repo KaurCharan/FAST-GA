@@ -79,7 +79,7 @@ class BatteryModel:
                 n_parallel = 100
 
             else:
-                n_parallel = (Power[i]) // (Q_rat * vol_elecSys * C_max)  # initial estimate of modules in parallel
+                n_parallel = np.ceil((Power[i]) / (Q_rat * vol_elecSys * C_max))  # initial estimate of modules in parallel
 
         while i < len(t_duration):
             Pb = 0
