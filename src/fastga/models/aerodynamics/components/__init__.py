@@ -14,11 +14,14 @@
 from .airfoil_lift_curve_slope import ComputeAirfoilLiftCurveSlope
 from .clalpha_vt import ComputeClAlphaVT
 from .compute_L_D_max import ComputeLDMax
+
 from .cd_inlets import Cd0Inlets
 from .cd0_fuselage import Cd0FuselageHydrogenDorsal #additional code
 from .cd0_hydrogenstorage import Cd0HydrogenStorage #additional code
 from .cd0 import Cd0Hydrogen #additional code
 from .cd0_total import Cd0TotalHydrogen #additional code
+from .fuelcell_cooling import Cooling_Airflow
+from .compute_dep_landing import DEPLanding
 from .compute_cl_extreme import ComputeAircraftMaxCl
 from .compute_cl_extreme_htp import ComputeExtremeCLHtp
 from .compute_cl_extreme_wing import ComputeExtremeCLWing
@@ -38,5 +41,3 @@ from .hinge_moments_elevator import (
     ComputeHingeMomentsTail,
 )
 from .mach_interpolation import ComputeMachInterpolation
-
-

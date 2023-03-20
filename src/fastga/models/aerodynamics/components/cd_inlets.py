@@ -44,11 +44,13 @@ class Cd0Inlets(ExplicitComponent):
         self.add_input("data:aerodynamics:wing:cruise:reynolds", val=np.nan)
         self.add_input("data:geometry:fuselage:number_of_inlets", val=np.nan)
         self.add_input("data:geometry:wing:area", val=np.nan, units="ft**2")
+        self.add_input("data:geometry:propulsion:fuelcell:cooling:airflow", val=np.nan)
 
         if self.options["low_speed_aero"]:
             self.add_output("data:aerodynamics:inlets:low_speed:CD0")
         else:
             self.add_output("data:aerodynamics:inlets:cruise:CD0")
+
             self.add_output("data:geometry:inlets:width", units="ft")
             self.add_output("data:geometry:inlets:throat:length", units="ft")
             self.add_output("data:geometry:inlets:throat:width", units="ft")
@@ -66,8 +68,8 @@ class Cd0Inlets(ExplicitComponent):
         reynolds_number = inputs["data:aerodynamics:wing:cruise:reynolds"]
         fuselage_length = inputs["data:geometry:fuselage:length"]
         fuelcell_airflow = inputs["data:geometry:propulsion:fuelcell:air_flow"]
+        cooling_airflow = inputs["data:geometry:propulsion:fuelcell:cooling:airflow"]
         inlets = inputs["data:geometry:fuselage:number_of_inlets"]
-        wing_area = inputs["data:geometry:wing:area"]
 
         speed_of_sound = Atmosphere(cruise_alt, altitude_in_feet=False).speed_of_sound
         mach = v_cruise / speed_of_sound
@@ -77,7 +79,7 @@ class Cd0Inlets(ExplicitComponent):
         boundary_layer_thickness = (0.37 * (0.6 * fuselage_length)) / reynolds_number ** (1/5)
         momentum_thickness = boundary_layer_thickness / 6   # approximation
 
-        drag_parameter = fuelcell_airflow / (rho_cruise * v_cruise * momentum_thickness ** 2)
+        drag_parameter = (fuelcell_airflow + cooling_airflow) / (rho_cruise * v_cruise * momentum_thickness ** 2)
         dt = 1.203 * momentum_thickness * (drag_parameter ** 0.415)
 
         inlet_width = 4 * dt  # aspect ratio is 4
@@ -86,6 +88,8 @@ class Cd0Inlets(ExplicitComponent):
         max_external_height = dt + throat_thickness - throat_length * math.tan(alpha)
         lip_height = dt + 0.5 * throat_thickness - throat_length * math.tan(alpha)
         inlet_area = lip_height * inlet_width
+
+        wing_area = inputs["data:geometry:wing:area"]
 
         # Drag Computation
 
@@ -116,18 +120,17 @@ class Cd0Inlets(ExplicitComponent):
 
         incremental_drag = 0  # approximation from figure 15 for general aviation aircraft
 
+        outputs["data:geometry:inlets:width"] = inlet_width
+        outputs["data:geometry:inlets:maximum_height"] = max_external_height
+        outputs["data:geometry:inlets:lip_height"] = lip_height
+        outputs["data:geometry:inlets:area"] = inlet_area
+        outputs["data:geometry:inlets:throat:length"] = throat_length
+        outputs["data:geometry:inlets:throat:width"] = throat_thickness
         total_drag = (ram_drag + spillage_drag + incremental_drag)*(inlet_area/wing_area)
-        inlet_drag = 0 #total_drag * inlets
+        inlet_drag = total_drag * inlets
+
 
         if self.options["low_speed_aero"]:
             outputs["data:aerodynamics:inlets:low_speed:CD0"] = inlet_drag
         else:
             outputs["data:aerodynamics:inlets:cruise:CD0"] = inlet_drag
-            outputs["data:geometry:inlets:width"] = inlet_width
-            outputs["data:geometry:inlets:maximum_height"] = max_external_height
-            outputs["data:geometry:inlets:lip_height"] = lip_height
-            outputs["data:geometry:inlets:area"] = inlet_area
-            outputs["data:geometry:inlets:throat:length"] = throat_length
-            outputs["data:geometry:inlets:throat:width"] = throat_thickness
-
-
