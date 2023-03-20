@@ -29,6 +29,7 @@ from .wing_components.compute_misc_mass import ComputeMiscMass
 from .wing_components.compute_primary_mass import ComputePrimaryMass
 from .wing_components.compute_secondary_mass import ComputeSecondaryMass
 from .wing_components.update_wing_mass import UpdateWingMass
+from .wing_components import ComputePoddedHydrogenStorage #additional code
 
 from .constants import SUBMODEL_WING_MASS
 
@@ -72,6 +73,61 @@ class ComputeWingMassAnalytical(om.Group):
         self.add_subsystem("compute_primary_structure", ComputePrimaryMass(), promotes=["*"])
         self.add_subsystem("compute_secondary_structure", ComputeSecondaryMass(), promotes=["*"])
         self.add_subsystem("update_wing_mass", UpdateWingMass(), promotes=["*"])
+
+        # Solver configuration
+        self.nonlinear_solver.options["debug_print"] = True
+        # self.nonlinear_solver.options["err_on_non_converge"] = True
+        self.nonlinear_solver.options["iprint"] = 0
+        self.nonlinear_solver.options["maxiter"] = 20
+        # self.nonlinear_solver.options["reraise_child_analysiserror"] = True
+        self.nonlinear_solver.options["rtol"] = 1e-4
+
+        # self.linear_solver.options["err_on_non_converge"] = True
+        self.linear_solver.options["iprint"] = 0
+        self.linear_solver.options["maxiter"] = 10
+        self.linear_solver.options["rtol"] = 1e-4
+
+
+@oad.RegisterSubmodel(SUBMODEL_WING_MASS, "fastga.submodel.weight.mass.airframe.wing.analytical.hydrogenpods")
+class ComputeWingMassAnalyticalHydrogenPods(om.Group):
+    """
+    Computes analytically the  mass of each component of the wing and add them to get total wing
+    mass
+
+    Loop on the wing mass cause its both a relief force and the result.
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        # Solvers setup
+        self.nonlinear_solver = om.NonlinearBlockGS()
+        self.linear_solver = om.LinearBlockGS()
+
+    def setup(self):
+        self.add_subsystem("compute_web_mass_max_fuel", ComputeWebMass(), promotes=["*"])
+        self.add_subsystem(
+            "compute_web_mass_min_fuel", ComputeWebMass(min_fuel_in_wing=True), promotes=["*"]
+        )
+        self.add_subsystem("compute_upp_flange_mass_max_fuel", ComputeUpperFlange(), promotes=["*"])
+        self.add_subsystem(
+            "compute_upp_flange_mass_min_fuel",
+            ComputeUpperFlange(min_fuel_in_wing=True),
+            promotes=["*"],
+        )
+        self.add_subsystem("compute_low_flange_mass_max_fuel", ComputeLowerFlange(), promotes=["*"])
+        self.add_subsystem(
+            "compute_low_flange_mass_min_fuel",
+            ComputeLowerFlange(min_fuel_in_wing=True),
+            promotes=["*"],
+        )
+        self.add_subsystem("compute_skin_mass", ComputeSkinMass(), promotes=["*"])
+        self.add_subsystem("compute_ribs_mass", ComputeRibsMass(), promotes=["*"])
+        self.add_subsystem("compute_misc_mass", ComputeMiscMass(), promotes=["*"])
+        self.add_subsystem("compute_primary_structure", ComputePrimaryMass(), promotes=["*"])
+        self.add_subsystem("compute_secondary_structure", ComputeSecondaryMass(), promotes=["*"])
+        self.add_subsystem("update_wing_mass", UpdateWingMass(), promotes=["*"])
+        self.add_subsystem("compute_podded_hydrogen_storage", ComputePoddedHydrogenStorage(), promotes=["*"]) #additional code
 
         # Solver configuration
         self.nonlinear_solver.options["debug_print"] = True

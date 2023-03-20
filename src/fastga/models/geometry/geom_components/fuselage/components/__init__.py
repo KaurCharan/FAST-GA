@@ -17,5 +17,10 @@ from .compute_fuselage_dimensions import (
     ComputeFuselageGeometryCabinSizingFD,
     ComputeFuselageGeometryCabinSizingFL,
     ComputeFuselageGeometryCabinSizingH2,
+    ComputeFuselageGeometryCabinSizingDorsalH2,
+    ComputeFuselageGeometryCabinSizingForwardH2,
 )
-from .compute_fuselage_wet_area import ComputeFuselageWetArea
+from .compute_fuselage_wet_area import (
+    ComputeFuselageWetArea,
+    ComputeFuselageWetAreaHydrogenDorsal,
+)
