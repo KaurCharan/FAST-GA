@@ -38,6 +38,7 @@ class Cooling_Airflow(ExplicitComponent):
 
         altitude = inputs["altitude"]
         T_ain = Atmosphere(altitude, altitude_in_feet=False).temperature
+
         power = inputs["fuelcell_Pelec_max"]
         fuelcell_efficiency = inputs["data:propulsion:fuelcell:efficiency"]
 
@@ -57,15 +58,13 @@ class Cooling_Airflow(ExplicitComponent):
         )
 
         fuel_cell_effectiveness = 0.8
-
-        T_fin = 383  # temperature in kelvin (45 Celsius based on approximations)
+        T_fin = 383  # temperature in kelvin (110 Celsius based on approximations)
 
         delta_T = fuel_cell_effectiveness * (T_fin - T_ain)
 
         airflow = heat_dissipated / (Cp * delta_T)
-        max_airflow = np.max(airflow)
-        index_of_max = np.argmax(max_airflow)
+        max_airflow = np.amax(airflow)
+        index = np.where(airflow == max_airflow)[0][0]
 
         outputs["data:geometry:propulsion:fuelcell:cooling:airflow"] = max_airflow
-        outputs["data:geometry:propulsion:fuelcell:cooling:max_airflow"] = index_of_max
-
+        outputs["data:geometry:propulsion:fuelcell:cooling:max_airflow"] = index
