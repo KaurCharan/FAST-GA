@@ -39,20 +39,14 @@ class Cooling_Airflow(ExplicitComponent):
         self.add_output("data:geometry:propulsion:fuelcell:cooling:airflow", units="kg/s")
         self.add_output("data:geometry:propulsion:fuelcell:cooling:max_airflow")
 
-
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         altitude = inputs["altitude"]
         T_ain = Atmosphere(altitude, altitude_in_feet=False).temperature
-
-
-        power = inputs["data:geometry:propulsion:fuelcell:power"]
-
         power = inputs["fuelcell_Pelec_max"]
         fuelcell_efficiency = inputs["data:propulsion:fuelcell:efficiency"]
 
         heat_dissipated = (1 - fuelcell_efficiency) * power
-
 
         # Constants for estimating the specific heat capacity of air
         Cp_0 = 1005.7
@@ -73,7 +67,7 @@ class Cooling_Airflow(ExplicitComponent):
 
         delta_T = fuel_cell_effectiveness * (T_fin - T_ain)
 
-        airflow = power / (Cp * delta_T)
+        airflow = heat_dissipated / (Cp * delta_T)
         max_airflow = np.max(airflow)
         index_of_max = airflow.index(max_airflow)
 

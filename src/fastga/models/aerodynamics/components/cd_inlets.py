@@ -44,7 +44,7 @@ class Cd0Inlets(ExplicitComponent):
         self.add_input("data:aerodynamics:wing:cruise:reynolds", val=np.nan)
         self.add_input("data:geometry:fuselage:number_of_inlets", val=np.nan)
         self.add_input("data:geometry:wing:area", val=np.nan, units="ft**2")
-        self.add_input("data:geometry:propulsion:fuelcell:cooling:airflow", val=np.nan)
+        self.add_input("data:geometry:propulsion:fuelcell:cooling:airflow", val=np.nan, units="kg/s")
 
         if self.options["low_speed_aero"]:
             self.add_output("data:aerodynamics:inlets:low_speed:CD0")
@@ -126,9 +126,9 @@ class Cd0Inlets(ExplicitComponent):
         outputs["data:geometry:inlets:area"] = inlet_area
         outputs["data:geometry:inlets:throat:length"] = throat_length
         outputs["data:geometry:inlets:throat:width"] = throat_thickness
+
         total_drag = (ram_drag + spillage_drag + incremental_drag)*(inlet_area/wing_area)
         inlet_drag = total_drag * inlets
-
 
         if self.options["low_speed_aero"]:
             outputs["data:aerodynamics:inlets:low_speed:CD0"] = inlet_drag

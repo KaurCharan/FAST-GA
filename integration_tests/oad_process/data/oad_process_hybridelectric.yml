@@ -19,26 +19,26 @@ model:
         linear_solver: om.DirectSolver()
         geometry:
             id: fastga.geometry.hydrogen
-            propulsion_id: fastga.propulsion.hybrid_propulsion
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
         aerodynamics_lowspeed:
             id: fastga.aerodynamics.lowspeed.legacy
-            propulsion_id: fastga.propulsion.hybrid_propulsion
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             result_folder_path: D:/tmp
             compute_slipstream: false
         aerodynamics_highspeed:
             id: fastga.aerodynamics.highspeed.legacy
-            propulsion_id: fastga.propulsion.hybrid_propulsion
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             result_folder_path : D:/tmp
             compute_mach_interpolation : false
             compute_slipstream : false
         weight:
             id: fastga.weight.legacy
-            propulsion_id: fastga.propulsion.hybrid_propulsion
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
         mtow:
             id: fastga.loop.mtow
         performance:
             id: fastga.performances.mission
-            propulsion_id: fastga.propulsion.hybrid_propulsion
+            propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             out_file: D:/tmp/cirrus_sr22.csv
 #        hq:
 #            tail_sizing:
@@ -53,7 +53,12 @@ model:
 
 submodels:
     submodel.geometry.vertical_tail.position.fd: null
-    submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.flops
-    submodel.geometry.wing.thickness_ratio: fastga.submodel.geometry.wing.thickness_ratio.electric
+    submodel.geometry.fuselage.wet_area: fastga.submodel.geometry.fuselage.wet_area.legacy
+    submodel.geometry.wing.thickness_ratio: fastga.submodel.geometry.wing.thickness_ratio.legacy
     submodel.performances.energy_consumption: fastga.propulsion.hybrid_propulsion
     submodel.weight.mass.propulsion.installed_engine: null
+    submodel.weight.cg.propulsion: fastga.submodel.weight.cg.propulsion.hydrogenrear #additional code
+    submodel.aerodynamics.fuselage.cd0: fastga.submodel.aerodynamics.fuselage.cd0.legacy #additional code
+    submodel.aerodynamics.aircraft.cd0: fastga.submodel.aerodynamics.aircraft.cd0.legacy #additional code
+    submodel.aerodynamics.sum.cd0: fastga.submodel.aerodynamics.sum.cd0.legacy #additional code
+    submodel.weight.mass.airframe.wing.analytical: fastga.submodel.weight.mass.airframe.wing.analytical #additional code
