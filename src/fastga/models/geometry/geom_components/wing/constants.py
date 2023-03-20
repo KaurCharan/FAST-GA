@@ -12,9 +12,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-SUBMODEL_WING_THICKNESS_RATIO = "submodel.geometry.wing.thickness_ratio"
 SUBMODEL_WING_THICKNESS_RATIO_LEGACY = "submodel.geometry.wing.thickness_ratio.legacy"
-SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC = "submodel.geometry.wing.thickness_ratio.electric"
+SUBMODEL_WING_THICKNESS_RATIO_ELECTRIC = "submodel.geometry.wing.thickness_ratio.electric" 
 SUBMODEL_WING_SPAN = "submodel.geometry.wing.span"
 SUBMODEL_WING_L1_L4 = "submodel.geometry.wing.l1_l4"
 SUBMODEL_WING_L2_L3 = "submodel.geometry.wing.l2_l3"
