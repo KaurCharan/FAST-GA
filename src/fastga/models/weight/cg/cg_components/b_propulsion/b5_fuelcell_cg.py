@@ -37,3 +37,25 @@ class ComputeFuelCellCG(ExplicitComponent):
         cg_b5 = inputs["data:geometry:fuselage:length"] - inputs["data:geometry:fuselage:tank_length"] - inputs["data:geometry:fuselage:rear_length"] - 0.5*inputs["data:geometry:fuselage:fuelcell:length"]
 
         outputs["data:weight:propulsion:fuelcell:CG:x"] = cg_b5
+
+class ComputeFuelCellCGHydrogenForward(ExplicitComponent):
+    # TODO: Document equations. Cite sources
+    """Fuel cell center of gravity estimation"""
+
+    def setup(self):
+
+        self.add_input("data:weight:propulsion:fuselage:fuelcell", val=np.nan, units="kg")
+        self.add_input("data:geometry:fuselage:length", val=np.nan, units="m")
+        self.add_input("data:geometry:fuselage:tank_length", val=np.nan, units="m")
+        self.add_input("data:geometry:fuselage:fuelcell:length", val=np.nan, units="m")
+        self.add_input("data:geometry:fuselage:rear_length", val=np.nan, units="m")
+
+        self.add_output("data:weight:propulsion:fuelcell:CG:x", units="m")
+
+        self.declare_partials("*", "*", method="fd")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        cg_b5 = inputs["data:geometry:fuselage:length"] - inputs["data:geometry:fuselage:rear_length"] - 0.5*inputs["data:geometry:fuselage:fuelcell:length"]
+
+        outputs["data:weight:propulsion:fuelcell:CG:x"] = cg_b5

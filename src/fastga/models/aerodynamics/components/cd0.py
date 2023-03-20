@@ -21,6 +21,7 @@ from openmdao.core.group import Group
 from ..constants import (
     SUBMODEL_CD0_WING,
     SUBMODEL_CD0_FUSELAGE,
+    SUBMODEL_CD0_HYDROGEN_STORAGE, #additional code
     SUBMODEL_CD0_HT,
     SUBMODEL_CD0_VT,
     SUBMODEL_CD0_NACELLE,
@@ -113,3 +114,88 @@ class Cd0(Group):
         )
 
 
+@oad.RegisterSubmodel(SUBMODEL_CD0, "fastga.submodel.aerodynamics.aircraft.cd0.hydrogen")
+class Cd0Hydrogen(Group):
+    def initialize(self):
+        self.options.declare("low_speed_aero", default=False, types=bool)
+        self.options.declare("propulsion_id", default="", types=str)
+        self.options.declare("airfoil_folder_path", default=None, types=str, allow_none=True)
+        self.options.declare(
+            "wing_airfoil_file", default="naca23012.af", types=str, allow_none=True
+        )
+        self.options.declare("htp_airfoil_file", default="naca0012.af", types=str, allow_none=True)
+
+    def setup(self):
+        options_wing = {
+            "airfoil_folder_path": self.options["airfoil_folder_path"],
+            "low_speed_aero": self.options["low_speed_aero"],
+            "wing_airfoil_file": self.options["wing_airfoil_file"],
+        }
+        self.add_subsystem(
+            "cd0_wing",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_WING, options=options_wing),
+            promotes=["*"],
+        )
+
+        low_speed_option = {"low_speed_aero": self.options["low_speed_aero"]}
+        self.add_subsystem(
+            "cd0_fuselage",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_FUSELAGE, options=low_speed_option),
+            promotes=["*"],
+        )
+
+        options_htp = {
+            "airfoil_folder_path": self.options["airfoil_folder_path"],
+            "low_speed_aero": self.options["low_speed_aero"],
+            "htp_airfoil_file": self.options["htp_airfoil_file"],
+        }
+        self.add_subsystem(
+            "cd0_ht",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_HT, options=options_htp),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "cd0_vt",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_VT, options=low_speed_option),
+            promotes=["*"],
+        )
+
+        options_nacelle = {
+            "low_speed_aero": self.options["low_speed_aero"],
+            "propulsion_id": self.options["propulsion_id"],
+        }
+        self.add_subsystem(
+            "cd0_nacelle",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_NACELLE, options=options_nacelle),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "cd0_l_gear",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_LANDING_GEAR, options=low_speed_option),
+            promotes=["*"],
+        )
+
+        self.add_subsystem(
+            "cd0_other",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_OTHER, options=low_speed_option),
+            promotes=["*"],
+        )
+        self.add_subsystem(
+            "cd_inlets",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_INLETS, options=low_speed_option),
+            promotes=["*"]
+        )
+
+        self.add_subsystem(
+            "cd_hydrogen_storage",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_HYDROGEN_STORAGE, options=low_speed_option),
+            promotes=["*"]
+        )
+
+        self.add_subsystem(
+            "cd0_total",
+            oad.RegisterSubmodel.get_submodel(SUBMODEL_CD0_SUM, options=low_speed_option),
+            promotes=["*"],
+        )

@@ -15,7 +15,10 @@
 # flake8: noqa
 
 from .a1_wing_weight import ComputeWingWeight
-from .a1_wing_weight_analytical import ComputeWingMassAnalytical
+from .a1_wing_weight_analytical import (
+    ComputeWingMassAnalytical,
+    ComputeWingMassAnalyticalHydrogenPods
+    ) #additional code
 from .a2_fuselage_weight import ComputeFuselageWeight
 from .a2_fuselage_weight import ComputeFuselageWeightRaymer
 from .a2_fuselage_weight_analytical import ComputeFuselageMassAnalytical

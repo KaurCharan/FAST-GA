@@ -24,16 +24,32 @@ from .dummy_engines import ENGINE_WRAPPER_BE76 as ENGINE_WRAPPER
 XML_FILE = "hybrid_electric_ac.xml"
 
 from ..geom_components.fuselage.components import (
-    ComputeFuselageGeometryCabinSizingH2
+    ComputeFuselageGeometryCabinSizingH2,
+    ComputeFuselageWetArea,
+    ComputeFuselageWetAreaHydrogenDorsal,
+    ComputeFuselageGeometryCabinSizingDorsalH2
 )
 
-from ..geom_components.fuselage.compute_fuselage import ComputeFuselageH2
+from ..geom_components.fuselage.compute_fuselage import (
+    ComputeFuselageH2,
+    ComputeFuselageDorsalH2,
+)
 
-from ..geometry import GeometryHydrogenFuselage
+from ..geometry import (
+    GeometryHydrogenFuselage,
+    GeometryHydrogenDorsalFuselage,
+)
 
 def test_compute_fuselage_cabin_sizing_h2():
     ivc = get_indep_var_comp(
         list_inputs(ComputeFuselageGeometryCabinSizingH2(propulsion_id=ENGINE_WRAPPER)),
+        __file__,
+        XML_FILE,
+    )
+
+def test_compute_fuselage_cabin_sizing_dorsal_h2():
+    ivc = get_indep_var_comp(
+        list_inputs(ComputeFuselageGeometryCabinSizingDorsalH2(propulsion_id=ENGINE_WRAPPER)),
         __file__,
         XML_FILE,
     )
@@ -45,6 +61,13 @@ def test_compute_fuselage_h2():
         XML_FILE,
     )
 
+def test_compute_fuselage_dorsal_h2():
+    ivc = get_indep_var_comp(
+        list_inputs(ComputeFuselageDorsalH2(propulsion_id=ENGINE_WRAPPER)),
+        __file__,
+        XML_FILE,
+    )
+
 def test_complete_geometry_hydrogen_fuselage():
     """Run computation of all models for fixed distance hypothesis"""
 
@@ -52,4 +75,20 @@ def test_complete_geometry_hydrogen_fuselage():
     # noinspection PyTypeChecker
     ivc = get_indep_var_comp(
         list_inputs(GeometryHydrogenFuselage(propulsion_id=ENGINE_WRAPPER)), __file__, XML_FILE
+    )
+
+def test_complete_geometry_hydrogen_dorsal_fuselage():
+    """Run computation of all models for fixed distance hypothesis"""
+
+    # Research independent input value in .xml file and add values calculated from other modules
+    # noinspection PyTypeChecker
+    ivc = get_indep_var_comp(
+        list_inputs(GeometryHydrogenDorsalFuselage(propulsion_id=ENGINE_WRAPPER)), __file__, XML_FILE
+    )
+
+def test_compute_fuselage_wet_area_hydrogen_dorsal():
+    ivc = get_indep_var_comp(
+        list_inputs(ComputeFuselageWetAreaHydrogenDorsal()),
+        __file__,
+        XML_FILE,
     )

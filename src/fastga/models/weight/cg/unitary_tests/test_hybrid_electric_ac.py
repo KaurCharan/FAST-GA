@@ -18,7 +18,10 @@ from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from ..cg_components.b_propulsion import (
     FuelPropulsionCG,
+    FuelPropulsionCGHydrogenRear,
+    FuelPropulsionCGHydrogenDorsal,
     ComputeHydrogenStorageCG,
+    ComputeHydrogenStorageDorsalCG,
     ComputeFuelCellCG,
 )
 
@@ -31,10 +34,25 @@ def test_compute_cg_fuel_propulsion():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(list_inputs(FuelPropulsionCG()), __file__, XML_FILE)
 
+def test_compute_cg_fuel_propulsion_hydrogen_rear():
+    """Tests whole fuel propulsion center of gravity."""
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(list_inputs(FuelPropulsionCGHydrogenRear()), __file__, XML_FILE)
+
+def test_compute_cg_fuel_propulsion_hydrogen_dorsal():
+    """Tests whole fuel propulsion center of gravity."""
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(list_inputs(FuelPropulsionCGHydrogenDorsal()), __file__, XML_FILE)
+
 def test_compute_cg_hydrogen_storage():
     """Tests whole hydrogen storage center of gravity."""
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(list_inputs(ComputeHydrogenStorageCG()), __file__, XML_FILE)
+
+def test_compute_cg_hydrogen_storage_dorsal():
+    """Tests whole hydrogen storage center of gravity."""
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(list_inputs(ComputeHydrogenStorageDorsalCG()), __file__, XML_FILE)
 
 def test_compute_cg_fuel_cell():
     """Tests whole fuel cell center of gravity."""
