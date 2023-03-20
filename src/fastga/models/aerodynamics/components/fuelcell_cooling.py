@@ -64,7 +64,7 @@ class Cooling_Airflow(ExplicitComponent):
 
         airflow = heat_dissipated / (Cp * delta_T)
         max_airflow = np.max(airflow)
-        index_of_max = airflow.index(max_airflow)
+        index_of_max = np.argmax(max_airflow)
 
         outputs["data:geometry:propulsion:fuelcell:cooling:airflow"] = max_airflow
         outputs["data:geometry:propulsion:fuelcell:cooling:max_airflow"] = index_of_max
