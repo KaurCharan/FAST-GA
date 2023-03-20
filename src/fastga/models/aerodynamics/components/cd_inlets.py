@@ -120,13 +120,6 @@ class Cd0Inlets(ExplicitComponent):
 
         incremental_drag = 0  # approximation from figure 15 for general aviation aircraft
 
-        outputs["data:geometry:inlets:width"] = inlet_width
-        outputs["data:geometry:inlets:maximum_height"] = max_external_height
-        outputs["data:geometry:inlets:lip_height"] = lip_height
-        outputs["data:geometry:inlets:area"] = inlet_area
-        outputs["data:geometry:inlets:throat:length"] = throat_length
-        outputs["data:geometry:inlets:throat:width"] = throat_thickness
-
         total_drag = (ram_drag + spillage_drag + incremental_drag)*(inlet_area/wing_area)
         inlet_drag = total_drag * inlets
 
@@ -134,3 +127,9 @@ class Cd0Inlets(ExplicitComponent):
             outputs["data:aerodynamics:inlets:low_speed:CD0"] = inlet_drag
         else:
             outputs["data:aerodynamics:inlets:cruise:CD0"] = inlet_drag
+            outputs["data:geometry:inlets:width"] = inlet_width
+            outputs["data:geometry:inlets:maximum_height"] = max_external_height
+            outputs["data:geometry:inlets:lip_height"] = lip_height
+            outputs["data:geometry:inlets:area"] = inlet_area
+            outputs["data:geometry:inlets:throat:length"] = throat_length
+            outputs["data:geometry:inlets:throat:width"] = throat_thickness

@@ -37,7 +37,7 @@ model:
         mtow:
             id: fastga.loop.mtow
         performance:
-            id: fastga.performances.mission
+            id: fastga.performances.mission_vector
             propulsion_id: fastga.wrapper.propulsion.basicIC_engine
             out_file: D:/tmp/cirrus_sr22.csv
 #        hq:

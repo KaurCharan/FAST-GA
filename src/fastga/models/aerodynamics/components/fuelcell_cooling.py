@@ -26,11 +26,6 @@ class Cooling_Airflow(ExplicitComponent):
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
-        self.add_input("data:geometry:propulsion:fuelcell:power", val=np.nan, units="W")
-        self.add_input("altitude", val=np.full(number_of_points, np.nan), units="m")
-
-        self.add_output("data:geometry:propulsion:fuelcell:cooling:airflow", units="kg/s")
-        self.add_output("data:geometry:propulsion:fuelcell:cooling:max_airflow", val=np.n)
 
         self.add_input("fuelcell_Pelec_max", val=np.nan, units="W")
         self.add_input("data:propulsion:fuelcell:efficiency", val=0.50)
