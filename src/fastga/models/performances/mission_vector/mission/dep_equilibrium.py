@@ -15,6 +15,7 @@ import openmdao.api as om
 import fastoad.api as oad
 
 from ..constants import SUBMODEL_DEP_EFFECT, SUBMODEL_EQUILIBRIUM, SUBMODEL_ENERGY_CONSUMPTION
+from fastga.models.aerodynamics.constants import SUBMODEL_FUELCELL_COOLING
 from ..mission.energy_consumption_preparation import PrepareForEnergyConsumption
 from ..mission.equilibrium import Equilibrium
 
@@ -74,6 +75,15 @@ class DEPEquilibrium(om.Group):
             self.add_subsystem(
                 "compute_dep_effect",
                 oad.RegisterSubmodel.get_submodel(SUBMODEL_DEP_EFFECT, options=options_dep),
+                promotes_inputs=["*"],
+                promotes_outputs=["*"],
+            )
+            options_cooling = {
+                "number_of_points": number_of_points,
+            }
+            self.add_subsystem(
+                "FC_COOLING",
+                oad.RegisterSubmodel.get_submodel(SUBMODEL_FUELCELL_COOLING, options=options_cooling),
                 promotes_inputs=["*"],
                 promotes_outputs=["*"],
             )

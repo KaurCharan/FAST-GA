@@ -14,3 +14,4 @@
 SUBMODEL_DEP_EFFECT = "submodel.performances.dep_effect"
 SUBMODEL_EQUILIBRIUM = "submodel.performances.equilibrium"
 SUBMODEL_ENERGY_CONSUMPTION = "submodel.performances.energy_consumption"
+

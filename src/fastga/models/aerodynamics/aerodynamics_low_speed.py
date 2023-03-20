@@ -35,6 +35,7 @@ from .constants import (
     SUBMODEL_CL_ALPHA_VT,
     SUBMODEL_CY_RUDDER,
     SUBMODEL_EFFECTIVE_EFFICIENCY_PROPELLER,
+    SUBMODEL_DEP_LANDING
 )
 
 
@@ -123,6 +124,10 @@ class AerodynamicsLowSpeed(Group):
 
         self.add_subsystem(
             "high_lift", oad.RegisterSubmodel.get_submodel(SUBMODEL_DELTA_HIGH_LIFT), promotes=["*"]
+        )
+
+        self.add_subsystem(
+            "DEPLanding", oad.RegisterSubmodel.get_submodel(SUBMODEL_DEP_LANDING), promotes=["*"]
         )
 
         option_wing_airfoil = {"wing_airfoil_file": self.options["wing_airfoil"]}

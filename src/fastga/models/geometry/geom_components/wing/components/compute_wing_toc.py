@@ -36,7 +36,7 @@ class ComputeWingToc(om.ExplicitComponent):
         self.add_output("data:geometry:wing:kink:thickness_ratio")
         self.add_output("data:geometry:wing:tip:thickness_ratio")
 
-        self.declare_partials("", "", method="fd")
+        self.declare_partials("*", "*", method="fd")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 

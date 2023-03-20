@@ -47,3 +47,5 @@ SUBMODEL_CM_ALPHA_FUSELAGE = "submodel.aerodynamics.fuselage.pitching_moment"
 SUBMODEL_VH = "submodel.aerodynamics.aircraft.max_level_speed"
 SUBMODEL_THRUST_POWER_SLIPSTREAM = "submodel.aerodynamics.wing.slipstream.thrust_power_computation"
 SUBMODEL_FUELCELL_COOLING = "fastga.submodel.aerodynamics.fuelcell.cooling.legacy"
+SUBMODEL_DEP_LANDING = "fastga.submodel.performances.dep_effects_landing"
+

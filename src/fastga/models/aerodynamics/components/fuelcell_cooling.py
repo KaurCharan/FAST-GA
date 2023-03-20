@@ -1,7 +1,5 @@
 import math
-
 import numpy as np
-import openmdao.api as om
 import fastoad.api as oad
 from openmdao.core.explicitcomponent import ExplicitComponent
 from stdatm import Atmosphere
@@ -20,22 +18,41 @@ class Cooling_Airflow(ExplicitComponent):
 
     """
 
+    def initialize(self):
+        self.options.declare(
+            "number_of_points", default=1, desc="number of equilibrium to be treated"
+        )
+
     def setup(self):
 
         number_of_points = self.options["number_of_points"]
-
         self.add_input("data:geometry:propulsion:fuelcell:power", val=np.nan, units="W")
         self.add_input("altitude", val=np.full(number_of_points, np.nan), units="m")
 
         self.add_output("data:geometry:propulsion:fuelcell:cooling:airflow", units="kg/s")
         self.add_output("data:geometry:propulsion:fuelcell:cooling:max_airflow", val=np.n)
 
+        self.add_input("fuelcell_Pelec_max", val=np.nan, units="W")
+        self.add_input("data:propulsion:fuelcell:efficiency", val=0.50)
+        self.add_input("altitude", val=np.full(number_of_points, np.nan), units="m")
+
+        self.add_output("data:geometry:propulsion:fuelcell:cooling:airflow", units="kg/s")
+        self.add_output("data:geometry:propulsion:fuelcell:cooling:max_airflow")
+
+
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
 
         altitude = inputs["altitude"]
         T_ain = Atmosphere(altitude, altitude_in_feet=False).temperature
 
+
         power = inputs["data:geometry:propulsion:fuelcell:power"]
+
+        power = inputs["fuelcell_Pelec_max"]
+        fuelcell_efficiency = inputs["data:propulsion:fuelcell:efficiency"]
+
+        heat_dissipated = (1 - fuelcell_efficiency) * power
+
 
         # Constants for estimating the specific heat capacity of air
         Cp_0 = 1005.7
@@ -51,7 +68,8 @@ class Cooling_Airflow(ExplicitComponent):
         )
 
         fuel_cell_effectiveness = 0.8
-        T_fin = 318  # temperature in kelvin (45 Celsius based on approximations)
+
+        T_fin = 383  # temperature in kelvin (45 Celsius based on approximations)
 
         delta_T = fuel_cell_effectiveness * (T_fin - T_ain)
 
@@ -61,8 +79,4 @@ class Cooling_Airflow(ExplicitComponent):
 
         outputs["data:geometry:propulsion:fuelcell:cooling:airflow"] = max_airflow
         outputs["data:geometry:propulsion:fuelcell:cooling:max_airflow"] = index_of_max
-
-
-
-
 

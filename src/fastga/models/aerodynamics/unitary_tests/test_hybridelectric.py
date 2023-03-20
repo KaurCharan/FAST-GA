@@ -7,15 +7,22 @@ from .dummy_engines import ENGINE_WRAPPER_SR22 as ENGINE_WRAPPER
 from .test_functions import (
     cd_inlets,
     cooling_airflow,
+    cd_inlets,cooling_airflow
+
 )
 
-XML_FILE = "hybrid_electric.xml"
+XML_FILE = "hybrid_electric_ac.xml"
 SKIP_STEPS = True  # avoid some tests to accelerate validation process (intermediary VLM/OpenVSP)
 
+#def test_cd_inlets():
 
 def test_cd_inlets():
     """Tests the drag produced by the flush inlets by calculating the drag coefficient."""
     cd_inlets(XML_FILE)
+
+
+#    """Tests the drag produced by the flush inlets by calculating the drag coefficient."""
+#   cd_inlets(XML_FILE)
 
 
 def test_cooling_airflow():
