@@ -179,9 +179,7 @@ class ComputePower(om.ExplicitComponent):
         """
 
         # Calculate, for array, mechanical power @ given altitude and speed
-        mechanical_power = (
-                thrust * true_airspeed / propeller_efficiency
-        )
+        mechanical_power = (thrust * true_airspeed / propeller_efficiency)  # in [Watts]
         print("power is", mechanical_power)
         #mechanical_power_check = [150000 for i in range(252)]   ## TODO: comment when running full oad process
 

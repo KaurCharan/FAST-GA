@@ -1,7 +1,7 @@
 <FASTOAD_model>
   <data>
     <TLAR>
-      <NPAX_design is_input="True">13.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
+      <NPAX_design is_input="True">12.0<!--top-level requirement: number of passengers for the design mission, assuming a classic eco/business class repartition--></NPAX_design>
       <luggage_mass_design units="kg" is_input="True">150.0<!--top-level requirement: luggage mass per passenger for the design mission--></luggage_mass_design>
       <range units="NM" is_input="True">270<!--top-level requirement: design range--></range>
       <v_approach units="kn" is_input="True">118.0<!--top-level requirement: approach speed--></v_approach>
@@ -26,6 +26,14 @@
           <thrust_limit units="N" is_input="False">[13454.237385926104, 14297.366018236862, 15388.051421759068, 16433.161450225896, 17326.19481728322, 18173.734530867245, 19010.49989267272, 19856.794684062203, 20729.77554595099, 21629.405446694745]<!--maximum thrust output of the propeller at sea level for varying velocities--></thrust_limit>
         </sea_level>
       </propeller>
+      <cooling>
+        <cruise>
+          <CD0 is_input="True">0.002531<!--profile drag (includes 10% increase for inlets) due to cooling in cruise conditions. original 0.002301--></CD0>
+        </cruise>
+        <low_speed>
+          <CD0 is_input="True">0.002531<!--profile drag (includes 10% increase for inlets) due to cooling in low speed conditions. original 0.002301--></CD0>
+        </low_speed>
+      </cooling>
     </aerodynamics>
     <geometry>
       <propulsion>
@@ -44,7 +52,7 @@
         </luggage>
         <seats>
           <passenger>
-            <NPAX_max is_input="True">13.0<!--maximum seating capability of the aircraft--></NPAX_max>
+            <NPAX_max is_input="True">12.0<!--maximum seating capability of the aircraft--></NPAX_max>
             <count_by_row is_input="True">2.0<!--passenger seats per row--></count_by_row>
             <length units="m" is_input="True">0.89<!--passenger seats length--></length>
             <width units="m" is_input="True">0.58<!--passenger seats width--></width>
@@ -220,7 +228,7 @@
         </initial_climb>
         <takeoff>
           <duration units="s" is_input="False">150</duration>
-          <power units="W" is_input="False">950000</power>
+          <power units="W" is_input="False">990000</power>
           <energy units="W*h" is_input="False">0.0</energy>
           <elevator_angle units="deg" is_input="True">-30.0<!--elevator maximum angle during takeoff phase in sizing mission--></elevator_angle>
           <friction_coefficient_no_brake is_input="True">0.03<!--friction coefficient used during the computation of the takeoff phase--></friction_coefficient_no_brake>

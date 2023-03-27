@@ -124,12 +124,6 @@ class FuelcellParameters(om.ExplicitComponent):
         H2_density_300bar = inputs["H2_density_300bar"]
         H2_density_700bar = inputs["H2_density_700bar"]
         H2_density_liq = inputs["H2_density_liq"]
-        # H2_storageEff_300bar = inputs["H2_storageEff_300bar"]
-        # H2_storageEff_700bar = inputs["H2_storageEff_700bar"]
-        # H2_storageEff_liq = inputs["H2_storageEff_liq"]
-        # H2_volumeEff_300bar = inputs["H2_volumeEff_300bar"]
-        # H2_volumeEff_700bar = inputs["H2_volumeEff_700bar"]
-        # H2_volumeEff_liq = inputs["H2_volumeEff_liq"]
         margin = inputs["margin"]
         V_thermo = inputs["V_thermo"]
         Top = inputs["Top"]
@@ -161,7 +155,7 @@ class FuelcellParameters(om.ExplicitComponent):
         # power and time for descent
         electrical_power_descent = mechanical_power[200:250] / total_efficiency
         Descent_Pelec = electrical_power_descent
-        Taxi_Pelec = 0#mechanical_power[250:252] / total_efficiency
+        Taxi_Pelec = 0  # Taxi is not considered but can be as <<mechanical_power[250:252] / total_efficiency>>
         Descent_time = time_step[200:250]
         Taxi_time = time_step[250:252]
 
@@ -183,15 +177,8 @@ class FuelcellParameters(om.ExplicitComponent):
             delVp = 0.06 * np.log(P_oper / P_nom)
             V_cell.append(float(V_thermo - V_act - V_ohm - V_conc + delVp))
 
-        # Plotting Polarization curve
-        # plt.plot(I, V_cell)
-        # plt.axis([0, 200, 0, 1.2])
-        # plt.xlabel('Current [A]')
-        # plt.ylabel('Cell Voltage [V]')
-        # plt.title('Polarization Curve')
-        # plt.grid()
 
-        # User chooses the current to determine cell voltage
+        # User chooses the current to determine cell voltage (user input in .xml file)
         cell_current = float(cell_current)
         f_voltage = interp1d(I, V_cell)
         cell_voltage = float(f_voltage(cell_current))
@@ -236,24 +223,13 @@ class FuelcellParameters(om.ExplicitComponent):
         H2_mass = sum(TO_H2_mass) + sum(Climb_H2_mass) + sum(Cruise_H2_mass) + sum(Descent_H2_mass) + sum(Taxi_H2_mass)
         H2_mass_array = np.concatenate((Climb_H2_mass, Cruise_H2_mass, Descent_H2_mass, Taxi_H2_mass))
         # Air mass
-        Air_flow = max(sum(TO_air_massflow), sum(Climb_air_massflow), sum(Cruise_air_massflow),
-                       sum(Descent_air_massflow), sum(Taxi_air_massflow))
+        Air_flow = max(max(TO_air_massflow), max(Climb_air_massflow), max(Cruise_air_massflow),
+                       max(Descent_air_massflow), max(Taxi_air_massflow))
 
         # Volume of hydrogen for 300 bar, 700 bar and liquid form [m^3]
         H2_volume_300bar = H2_mass * margin / H2_density_300bar
         H2_volume_700bar = H2_mass * margin / H2_density_700bar
         H2_volume_liq = H2_mass * margin / H2_density_liq
-
-        if Cruise_Pelec_max <= 0 or FC_stack_mass > 1700:
-            FC_stack_mass = 1700
-            FC_stack_volume = 1
-            H2_mass = 60
-            H2_mass_array = [0.03 for i in range(252)]
-            Air_flow = 2
-            H2_volume_300bar = 1
-            H2_volume_700bar = 1
-            H2_volume_liq = 1
-            Cruise_stacks = 4
 
         outputs["fuelcell_Pelec_max"] = float(Cruise_Pelec_max)
         outputs["fuelcell_weight"] = float(FC_stack_mass)

@@ -38,7 +38,7 @@ class UpdateMTOW(ExplicitComponent):
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         zfw = inputs["data:weight:aircraft:ZFW"]
-        m_fuel = inputs["data:geometry:propulsion:hydrogen:weight"]
+        m_fuel = inputs["data:geometry:propulsion:hydrogen:weight"]  # hydrogen weight. output of fuel cell model.
 
         mtow = zfw + m_fuel
 

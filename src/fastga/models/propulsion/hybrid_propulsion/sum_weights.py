@@ -33,6 +33,6 @@ class SummationWeights(om.ExplicitComponent):
         _LOGGER.debug("Calculating total power plant weight")
         summation = inputs["fuelcell_weight"] + inputs["converter_weight"] + inputs["battery_weight"] + \
                     inputs["switch_weight"] + inputs["motor_weight"] + inputs["cables_weight"] + \
-                    1 * inputs["data:propulsion:controller:number"]
-        power = inputs["mechanical_power"]
-        outputs["data:propulsion:total_weight"] = summation
+                    1 * inputs["data:propulsion:controller:number"]  # here, 1 is for converter weight of 1 kg
+
+        outputs["data:propulsion:total_weight"] = summation  # total weight of power train in [kg]

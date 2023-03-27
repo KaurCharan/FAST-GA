@@ -15,7 +15,6 @@ import logging
 import numpy as np
 import openmdao.api as om
 
-# noinspection PyProtectedMember
 import fastoad.api as oad
 
 from fastga.models.propulsion.hybrid_propulsion.battery import BatteryModel
@@ -103,7 +102,7 @@ class BatteryParameters(om.ExplicitComponent):
         total_efficiency = inputs["data:propulsion:motor:efficiency"] * inputs["data:propulsion:gearbox:efficiency"] \
                            * inputs["data:propulsion:controller:efficiency"] \
                            * inputs["data:propulsion:switch:efficiency"] * inputs["data:propulsion:bus:efficiency"] \
-                            * inputs["data:propulsion:converter:efficiency"] \
+                           * inputs["data:propulsion:converter:efficiency"] \
                            * inputs["data:propulsion:cables:efficiency"] * inputs["battery_efficiency"]
 
         voltage = inputs["data:propulsion:system_voltage"]
@@ -112,23 +111,37 @@ class BatteryParameters(om.ExplicitComponent):
         time_TO = np.array(inputs["data:mission:sizing:takeoff:duration"])
         mechanical_power = inputs["mechanical_power"]
         mechanical_power_TO = np.array(inputs["data:mission:sizing:takeoff:power"])
-        mechanical_power_climb = mechanical_power[0:100]
+
+        mechanical_power_climb = mechanical_power[0:100]  # stores flight points for climb
+        # initialises for electrical power requirement from battery
         electrical_power = list(range(len(mechanical_power_climb)))
-        electrical_power_climb = mechanical_power_climb / total_efficiency
+        electrical_power_climb = mechanical_power_climb / total_efficiency  # total electrical power for climb points
+
+        # Subtracts electrical power supplied by fuelcell from total power requirement at flight points for takeoff
+        # and climb. This gives the battery power requirement as per scheme 3. Scheme 3 means that fuel cell operates
+        # during the cruise and landing phases. During takeoff and climb, fuel cell supplies power equivalent to its
+        # maximum power and the remaining is supplied by the battery. Hence, the battery is sized only for takeoff
+        # and climb.
         for idx in range(np.size(electrical_power_climb)):
             if electrical_power_climb[idx] > fuelcell_Pelec_max:
+                # electrical power requirement from battery for climb
                 electrical_power[idx] = float(abs(electrical_power_climb[idx] - fuelcell_Pelec_max))
             else:
                 electrical_power[idx] = 0
         if (mechanical_power_TO / total_efficiency / 0.80) > fuelcell_Pelec_max:
+            # electrical power requirement from battery for takeoff.
+            # here, 80% propeller efficiency is assumed. Note that the input takeoff power is aerodynamic power.
             electrical_power_TO = float((mechanical_power_TO / total_efficiency / 0.80) - fuelcell_Pelec_max)
         else:
             electrical_power_TO = 0
 
-        # append power and time together
+        # append battery power requirement and time together
         electrical_power_total = np.append(electrical_power_TO, electrical_power)
         time_total = np.append(time_TO, time_step[0:100])
-        if all(electrical_power_total <= 0) or (any(ele > 3e6 for ele in electrical_power_total) == 1):
+
+        # During code execution, for some iterations, it is possible that fuelcell power is greater than takeoff and
+        # climb power so, power requirement from battery will become zero. In this case, the battery model is skipped.
+        if all(electrical_power_total <= 0):
             energy_consumed = np.zeros(252)
             dod = np.zeros(101)
             eff_bat = np.zeros(101)
@@ -139,22 +152,27 @@ class BatteryParameters(om.ExplicitComponent):
             battery_eff_avg = 0.93
             _LOGGER.debug("Skipped battery model")
         else:
+            # battery power requirement, time and bus voltage are inputs to the battery model.
             battery_model = BatteryModel(electrical_power_total, time_total, voltage)
 
             # storing parameters
+            # call soc function in battery model.
             weight_cells, n_series, n_parallel, dod, eff_bat, Q_used = battery_model.compute_soc()
+            # call weight function in battery model.
             weight_BatteryPack = battery_model.compute_weight(weight_cells)
-            volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9   # in m3
+            # call volume function in battery model.
+            volume_BatteryPack = battery_model.compute_volume(n_parallel, n_series) / 10 ** 9  # in [m3]
+            # calculates an average battery efficiency.
             battery_eff_avg = np.average(eff_bat)
-            extra = [0.0 for i in range(152)]
-            #energy_consumed = np.concatenate((Q_used[1:101], extra))
+            # here, it is necessary to output non_consumable_energy_t_econ because of performance_per_phase.py needs
+            # it. Zeros are given as output for now as it does not impact the sizing.
             energy_consumed = np.zeros(252)
-        outputs["non_consumable_energy_t_econ"] = energy_consumed
-        outputs["data:propulsion:battery:dod"] = dod
+        outputs["non_consumable_energy_t_econ"] = energy_consumed  # in [Ah]
+        outputs["data:propulsion:battery:dod"] = dod  # in [%]
         outputs["data:geometry:propulsion:battery:n_parallel"] = n_parallel
         outputs["data:geometry:propulsion:battery:n_series"] = n_series
-        outputs["data:geometry:propulsion:battery:weight"] = weight_BatteryPack # [in kg]
-        outputs["battery_weight"] = weight_BatteryPack
-        outputs["data:geometry:propulsion:battery:volume"] = volume_BatteryPack
-        outputs["data:propulsion:battery:efficiency_out"] = eff_bat
-        outputs["data:propulsion:battery:efficiency"] = battery_eff_avg
+        outputs["data:geometry:propulsion:battery:weight"] = weight_BatteryPack  # in [kg]
+        outputs["battery_weight"] = weight_BatteryPack  # in [kg]
+        outputs["data:geometry:propulsion:battery:volume"] = volume_BatteryPack  # in [m3]
+        outputs["data:propulsion:battery:efficiency_out"] = eff_bat  # in [%]
+        outputs["data:propulsion:battery:efficiency"] = battery_eff_avg  # in [%]

@@ -45,16 +45,14 @@ class ComputeSwitchMass(om.ExplicitComponent):
         _LOGGER.debug("Calculating switch parameters")
         total_efficiency = inputs["data:propulsion:motor:efficiency"] * inputs["data:propulsion:gearbox:efficiency"] \
                            * inputs["data:propulsion:controller:efficiency"] * inputs[
-                               "data:propulsion:switch:efficiency"]
+                               "data:propulsion:switch:efficiency"]  # total efficiency at switch level
 
         mechanical_power_total = np.append(np.array(inputs["data:mission:sizing:takeoff:power"]),
                                            inputs["mechanical_power"])
         max_power = max(mechanical_power_total) / 1000  # in [kW]
-        electrical_power = max_power / total_efficiency
-        if any(ele > 1e6 for ele in electrical_power) == 1:
-            mass_switch = 1
-        else:
-            mass_switch = 1.6 * 1e-4 * electrical_power + 0.6
+        electrical_power = max_power / total_efficiency  # total electrical power [in kW]
+
+        mass_switch = 1.6 * 1e-4 * electrical_power + 0.6  # total switch mass in [kg]
 
         outputs["switch_weight"] = mass_switch
         outputs["data:geometry:propulsion:switch:weight"] = mass_switch

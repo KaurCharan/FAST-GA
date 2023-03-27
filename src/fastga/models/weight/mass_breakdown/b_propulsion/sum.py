@@ -60,13 +60,13 @@ class PropulsionWeight(om.Group):
             "hydrogen_storage_weight",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_HYDROGEN_STORAGE_MASS),
             promotes=["*"]
-        ) #additional code
+        )
 
         self.add_subsystem(
             "fuelcell_weight",
             oad.RegisterSubmodel.get_submodel(SUBMODEL_FUELCELL_MASS),
             promotes=["*"]
-        ) #additional code
+        )
 
         weight_sum = om.AddSubtractComp()
         weight_sum.add_equation(
@@ -74,6 +74,6 @@ class PropulsionWeight(om.Group):
             ["data:propulsion:total_weight", "hydrogen_storage_weight"],
             units="kg",
             desc="Mass of the propulsion system",
-        ) #additional code
+        )
 
         self.add_subsystem("propulsion_weight_sum", weight_sum, promotes=["*"])

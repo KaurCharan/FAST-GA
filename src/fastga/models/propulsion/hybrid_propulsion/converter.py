@@ -45,18 +45,16 @@ class ComputeConverterMass(om.ExplicitComponent):
                            * inputs["data:propulsion:switch:efficiency"] * inputs["data:propulsion:bus:efficiency"] \
                            * inputs["data:propulsion:converter:efficiency"]
 
-            # Power supplied to DC-DC converter [W]
+        # Power supplied to DC-DC converter [W]
         mechanical_power_total = np.append(np.array(inputs["data:mission:sizing:takeoff:power"]),
                                            inputs["mechanical_power"])
         max_power = max(mechanical_power_total) / 1000  # in [kW]
         electrical_power = max_power / total_efficiency
-        if any(ele > 1e6 for ele in electrical_power) == 1:
-            mass_inv_conv = 600
-        else:
-            powerToMassRatio = inputs[
-                "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [kW/kg]
 
-            mass_inv_conv = electrical_power / powerToMassRatio
+        powerToMassRatio = inputs[
+            "data:propulsion:converter:power_to_mass_ratio"]  # Power ro mass ratio of converter [kW/kg]
+
+        mass_inv_conv = electrical_power / powerToMassRatio  # in [kg]
 
         outputs["converter_weight"] = mass_inv_conv
         outputs["data:geometry:propulsion:converter:weight"] = mass_inv_conv
