@@ -22,6 +22,8 @@ from ..b_propulsion import (
 )
 from ..b_propulsion.sum import PropulsionWeight
 
+from ..a_airframe.wing_components import ComputePoddedHydrogenStorage
+
 from tests.testing_utilities import run_system, get_indep_var_comp, list_inputs
 
 from .dummy_engines import ENGINE_WRAPPER_BE76 as ENGINE_WRAPPER
@@ -43,4 +45,11 @@ def test_compute_propulsion_weight():
     # Research independent input value in .xml file
     ivc = get_indep_var_comp(
         list_inputs(PropulsionWeight(propulsion_id=ENGINE_WRAPPER)), __file__, XML_FILE
+    )
+
+def test_compute_podded_hydrogen_storage():
+    """Tests propulsion weight computation from sample XML data."""
+    # Research independent input value in .xml file
+    ivc = get_indep_var_comp(
+        list_inputs(ComputePoddedHydrogenStorage()), __file__, XML_FILE
     )

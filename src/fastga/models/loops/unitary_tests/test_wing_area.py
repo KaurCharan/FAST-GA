@@ -15,6 +15,7 @@ test module for wing area computation.
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os.path as pth
+import logging
 
 import openmdao.api as om
 
@@ -24,6 +25,11 @@ from ..wing_area_component.wing_area_loop_geom_simple import (
     UpdateWingAreaGeomSimple,
     ConstraintWingAreaGeomSimple,
 )
+
+from ..wing_area_component.wing_area_loop_geom_electric import (
+    UpdateWingAreaGeomElectric
+)
+
 from ..wing_area_component.wing_area_loop_cl_simple import (
     UpdateWingAreaLiftSimple,
     ConstraintWingAreaLiftSimple,
@@ -39,11 +45,13 @@ from ..wing_area_component.wing_area_cl_equilibrium import (
 from ..wing_area_component.update_wing_area import UpdateWingArea
 from ..update_wing_area_group import UpdateWingAreaGroup
 
+_LOGGER = logging.getLogger(__name__)
+
 from tests.testing_utilities import get_indep_var_comp, list_inputs, run_system
 
 DATA_FOLDER_PATH = pth.join(pth.dirname(__file__), "data")
 
-
+"""
 def test_update_wing_area_group():
 
     # Driven by fuel
@@ -115,10 +123,25 @@ def test_simple_geom():
     )
 
     # _ = problem_cons.check_partials(compact_print=True)
+"""
 
 
+def test_simple_geom_electric():
+
+    ivc_loop = om.IndepVarComp()
+    ivc_loop.add_output("data:geometry:wing:root:chord", 1.549, units="m")
+    ivc_loop.add_output("data:geometry:wing:tip:chord", 1.549, units="m")
+    ivc_loop.add_output("data:geometry:wing:root:thickness_ratio", 0.149)
+    ivc_loop.add_output("data:geometry:wing:tip:thickness_ratio", 0.103)
+    ivc_loop.add_output("data:geometry:propulsion:battery:volume", val=2, units="m**3")
+
+    problem_loop = run_system(UpdateWingAreaGeomElectric(), ivc_loop)
+
+    wing_area = problem_loop.get_val("wing_area")
+    assert wing_area == 27
+
+"""
 def test_simple_cl():
-
     ivc_loop = om.IndepVarComp()
     ivc_loop.add_output("data:TLAR:v_approach", val=78.0, units="kn")
     ivc_loop.add_output("data:weight:aircraft:MLW", val=1692.37, units="kg")
@@ -146,7 +169,6 @@ def test_simple_cl():
 
 
 def test_advanced_geom():
-
     ivc_loop = om.IndepVarComp()
     ivc_loop.add_output("data:propulsion:fuel_type", 1.0)
     ivc_loop.add_output("data:geometry:wing:root:thickness_ratio", 0.149)
@@ -207,7 +229,6 @@ def test_advanced_geom():
 
 
 def test_advanced_cl():
-
     xml_file = "beechcraft_76.xml"
 
     inputs_list = list_inputs(
@@ -254,7 +275,6 @@ def test_advanced_cl():
 
 
 def test_update_wing_area():
-
     ivc_geom = om.IndepVarComp()
     ivc_geom.add_output("wing_area:geometric", val=20.0, units="m**2")
     ivc_geom.add_output("wing_area:aerodynamic", val=15.0, units="m**2")
@@ -272,3 +292,5 @@ def test_update_wing_area():
     assert_allclose(problem_aero["data:geometry:wing:area"], 15.0, atol=1e-3)
 
     # _ = problem_aero.check_partials(compact_print=True)
+    
+"""

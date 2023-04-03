@@ -71,9 +71,36 @@ class PropulsionWeight(om.Group):
         weight_sum = om.AddSubtractComp()
         weight_sum.add_equation(
             "data:weight:propulsion:mass",
-            ["data:propulsion:total_weight", "hydrogen_storage_weight"],
+            ["data:propulsion:total_weight", "data:weight:propulsion:engine:mass"],
             units="kg",
             desc="Mass of the propulsion system",
         )
 
         self.add_subsystem("propulsion_weight_sum", weight_sum, promotes=["*"])
+
+# @oad.RegisterSubmodel(
+#     SUBMODEL_PROPULSION_MASS, "fastga.submodel.weight.mass.propulsion.legacy.electric"
+# )
+# class PropulsionWeightElectric(om.ExplicitComponent):
+#     """Computes mass of propulsion system."""
+#
+#     def initialize(self):
+#         self.options.declare("propulsion_id", default="", types=str)
+#
+#     def setup(self):
+#
+#         self.add_input(
+#             "data:propulsion:total_weight",
+#             units="kg",
+#             val=np.nan
+#         )
+#
+#         self.add_output(
+#             "data:weight:propulsion:mass",
+#             units="kg",
+#             val=2000
+#         )
+#
+#     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+#
+#         outputs["data:weight:propulsion:mass"] = inputs["data:propulsion:total_weight"]

@@ -19,8 +19,10 @@ import fastoad.api as oad
 
 from .b1_engine_cg import ComputeEngineCG
 from .b2_fuel_lines_cg import ComputeFuelLinesCG
-from .b4_hydrogen_storage_cg import ComputeHydrogenStorageCG #additional code
-from .b5_fuelcell_cg import ComputeFuelCellCG #additional code
+from .b4_hydrogen_storage_cg import (
+    ComputeHydrogenStorageCG, ComputeHydrogenStorageDorsalCG, ComputeHydrogenStorageForwardCG)  # additional code
+from .b5_fuelcell_cg import (
+    ComputeFuelCellCG, ComputeFuelCellCGHydrogenForward)  # additional code
 
 from ..constants import SUBMODEL_PROPULSION_CG
 
@@ -31,37 +33,158 @@ class FuelPropulsionCG(om.Group):
         self.add_subsystem("engine_cg", ComputeEngineCG(), promotes=["*"])
         self.add_subsystem("fuel_lines_cg", ComputeFuelLinesCG(), promotes=["*"])
         self.add_subsystem("propulsion_cg", ComputeFuelPropulsionCG(), promotes=["*"])
-        self.add_subsystem("hydrogen_storage_cg", ComputeHydrogenStorageCG(), promotes=["*"]) #additional code
-        self.add_subsystem("fuelcell_cg", ComputeFuelCellCG(), promotes=["*"]) #additional code
+
 
 class ComputeFuelPropulsionCG(om.ExplicitComponent):
     def setup(self):
         self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
         self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
-        self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan) #additional code
-        # self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan) #additional code
 
         self.add_input("data:weight:propulsion:engine:mass", units="kg", val=np.nan)
         self.add_input("data:weight:propulsion:fuel_lines:mass", units="kg", val=np.nan)
         self.add_input("data:weight:propulsion:mass", units="kg", val=np.nan)
-        self.add_input("data:weight:propulsion:fuselage:H2_storage_mass", units="kg", val=np.nan) #additional code
-        self.add_input("data:weight:propulsion:fuselage:fuelcell", units="kg", val=np.nan) #additional code
 
         self.add_output("data:weight:propulsion:CG:x", units="m")
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         engine_cg = inputs["data:weight:propulsion:engine:CG:x"]
         fuel_lines_cg = inputs["data:weight:propulsion:fuel_lines:CG:x"]
-        h2_storage_cg = inputs["data:weight:propulsion:H2_storage:CG:x"] #additional code
-        fuelcell_cg = inputs["data:weight:propulsion:H2_storage:CG:x"] #additional code
 
         engine_mass = inputs["data:weight:propulsion:engine:mass"]
         fuel_lines_mass = inputs["data:weight:propulsion:fuel_lines:mass"]
-        h2_storage_mass = inputs["data:weight:propulsion:fuselage:H2_storage_mass"] #additional code
-        fuelcell_mass = inputs["data:weight:propulsion:fuselage:fuelcell"] #additional code
 
-        cg_propulsion = (engine_cg * engine_mass + fuel_lines_cg * fuel_lines_mass + h2_storage_cg * h2_storage_mass + fuelcell_cg * fuelcell_mass) / (
-            engine_mass + fuel_lines_mass + h2_storage_mass + fuelcell_mass
-        ) #modified code
+        cg_propulsion = (engine_cg * engine_mass + fuel_lines_cg * fuel_lines_mass) / (
+                engine_mass + fuel_lines_mass
+        )  # modified code
+
+        outputs["data:weight:propulsion:CG:x"] = cg_propulsion
+
+
+@oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga.submodel.weight.cg.propulsion.hydrogenrear")
+class FuelPropulsionCGHydrogenRear(om.Group):
+    def setup(self):
+        self.add_subsystem("engine_cg", ComputeEngineCG(), promotes=["*"])
+        self.add_subsystem("fuel_lines_cg", ComputeFuelLinesCG(), promotes=["*"])
+        self.add_subsystem("propulsion_cg", ComputeFuelPropulsionCGHydrogenRear(), promotes=["*"])
+        self.add_subsystem("hydrogen_storage_cg", ComputeHydrogenStorageCG(), promotes=["*"])  # additional code
+        self.add_subsystem("fuelcell_cg", ComputeFuelCellCG(), promotes=["*"])  # additional code
+
+
+class ComputeFuelPropulsionCGHydrogenRear(om.ExplicitComponent):
+    def setup(self):
+        self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan)  # additional code
+
+        self.add_input("data:weight:propulsion:engine:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuselage:H2_storage_mass", units="kg", val=np.nan)  # additional code
+        self.add_input("data:weight:propulsion:fuselage:fuelcell", units="kg", val=np.nan)  # additional code
+
+        self.add_output("data:weight:propulsion:CG:x", units="m")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        engine_cg = inputs["data:weight:propulsion:engine:CG:x"]
+        fuel_lines_cg = inputs["data:weight:propulsion:fuel_lines:CG:x"]
+        h2_storage_cg = inputs["data:weight:propulsion:H2_storage:CG:x"]  # additional code
+        fuelcell_cg = inputs["data:weight:propulsion:H2_storage:CG:x"]  # additional code
+
+        engine_mass = inputs["data:weight:propulsion:engine:mass"]
+        fuel_lines_mass = inputs["data:weight:propulsion:fuel_lines:mass"]
+        h2_storage_mass = inputs["data:weight:propulsion:fuselage:H2_storage_mass"]  # additional code
+        fuelcell_mass = inputs["data:weight:propulsion:fuselage:fuelcell"]  # additional code
+
+        cg_propulsion = (
+                                    engine_cg * engine_mass + fuel_lines_cg * fuel_lines_mass + h2_storage_cg * h2_storage_mass + fuelcell_cg * fuelcell_mass) / (
+                                engine_mass + fuel_lines_mass + h2_storage_mass + fuelcell_mass
+                        )  # modified code
+
+        outputs["data:weight:propulsion:CG:x"] = cg_propulsion
+
+
+@oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga.submodel.weight.cg.propulsion.hydrogendorsal")
+class FuelPropulsionCGHydrogenDorsal(om.Group):
+    def setup(self):
+        self.add_subsystem("engine_cg", ComputeEngineCG(), promotes=["*"])
+        self.add_subsystem("fuel_lines_cg", ComputeFuelLinesCG(), promotes=["*"])
+        self.add_subsystem("propulsion_cg", ComputeFuelPropulsionCGHydrogenDorsal(), promotes=["*"])
+        self.add_subsystem("hydrogen_storage_cg", ComputeHydrogenStorageDorsalCG(), promotes=["*"])  # additional code
+        self.add_subsystem("fuelcell_cg", ComputeFuelCellCG(), promotes=["*"])  # additional code
+
+
+class ComputeFuelPropulsionCGHydrogenDorsal(om.ExplicitComponent):
+    def setup(self):
+        self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan)  # additional code
+
+        self.add_input("data:weight:propulsion:engine:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuselage:H2_storage_mass", units="kg", val=np.nan)  # additional code
+        self.add_input("data:weight:propulsion:fuselage:fuelcell", units="kg", val=np.nan)  # additional code
+
+        self.add_output("data:weight:propulsion:CG:x", units="m")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        engine_cg = inputs["data:weight:propulsion:engine:CG:x"]
+        fuel_lines_cg = inputs["data:weight:propulsion:fuel_lines:CG:x"]
+        h2_storage_cg = inputs["data:weight:propulsion:H2_storage:CG:x"]  # additional code
+        fuelcell_cg = inputs["data:weight:propulsion:H2_storage:CG:x"]  # additional code
+
+        engine_mass = inputs["data:weight:propulsion:engine:mass"]
+        fuel_lines_mass = inputs["data:weight:propulsion:fuel_lines:mass"]
+        h2_storage_mass = inputs["data:weight:propulsion:fuselage:H2_storage_mass"]  # additional code
+        fuelcell_mass = inputs["data:weight:propulsion:fuselage:fuelcell"]  # additional code
+
+        cg_propulsion = (
+                                    engine_cg * engine_mass + fuel_lines_cg * fuel_lines_mass + h2_storage_cg * h2_storage_mass + fuelcell_cg * fuelcell_mass) / (
+                                engine_mass + fuel_lines_mass + h2_storage_mass + fuelcell_mass
+                        )  # modified code
+
+        outputs["data:weight:propulsion:CG:x"] = cg_propulsion
+
+
+@oad.RegisterSubmodel(SUBMODEL_PROPULSION_CG, "fastga.submodel.weight.cg.propulsion.hydrogenforward")
+class FuelPropulsionCGHydrogenForward(om.Group):
+    def setup(self):
+        self.add_subsystem("engine_cg", ComputeEngineCG(), promotes=["*"])
+        self.add_subsystem("fuel_lines_cg", ComputeFuelLinesCG(), promotes=["*"])
+        self.add_subsystem("propulsion_cg", ComputeFuelPropulsionCGHydrogenForward(), promotes=["*"])
+        self.add_subsystem("hydrogen_storage_cg", ComputeHydrogenStorageForwardCG(), promotes=["*"])  # additional code
+        self.add_subsystem("fuelcell_cg", ComputeFuelCellCGHydrogenForward(), promotes=["*"])  # additional code
+
+
+class ComputeFuelPropulsionCGHydrogenForward(om.ExplicitComponent):
+    def setup(self):
+        self.add_input("data:weight:propulsion:engine:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:CG:x", units="m", val=np.nan)
+        self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan)  # additional code
+        # self.add_input("data:weight:propulsion:H2_storage:CG:x", units="m", val=np.nan) #additional code
+
+        self.add_input("data:weight:propulsion:engine:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuel_lines:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:mass", units="kg", val=np.nan)
+        self.add_input("data:weight:propulsion:fuselage:H2_storage_mass", units="kg", val=np.nan)  # additional code
+        self.add_input("data:weight:propulsion:fuselage:fuelcell", units="kg", val=np.nan)  # additional code
+
+        self.add_output("data:weight:propulsion:CG:x", units="m")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+        engine_cg = inputs["data:weight:propulsion:engine:CG:x"]
+        fuel_lines_cg = inputs["data:weight:propulsion:fuel_lines:CG:x"]
+        h2_storage_cg = inputs["data:weight:propulsion:H2_storage:CG:x"]  # additional code
+        fuelcell_cg = inputs["data:weight:propulsion:H2_storage:CG:x"]  # additional code
+
+        engine_mass = inputs["data:weight:propulsion:engine:mass"]
+        fuel_lines_mass = inputs["data:weight:propulsion:fuel_lines:mass"]
+        h2_storage_mass = inputs["data:weight:propulsion:fuselage:H2_storage_mass"]  # additional code
+        fuelcell_mass = inputs["data:weight:propulsion:fuselage:fuelcell"]  # additional code
+
+        cg_propulsion = (
+                                    engine_cg * engine_mass + fuel_lines_cg * fuel_lines_mass + h2_storage_cg * h2_storage_mass + fuelcell_cg * fuelcell_mass) / (
+                                engine_mass + fuel_lines_mass + h2_storage_mass + fuelcell_mass
+                        )  # modified code
 
         outputs["data:weight:propulsion:CG:x"] = cg_propulsion

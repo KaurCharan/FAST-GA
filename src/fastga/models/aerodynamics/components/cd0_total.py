@@ -88,3 +88,79 @@ class Cd0Total(ExplicitComponent):
             outputs["data:aerodynamics:aircraft:low_speed:CD0"] = cd0
         else:
             outputs["data:aerodynamics:aircraft:cruise:CD0"] = cd0
+
+
+@oad.RegisterSubmodel(SUBMODEL_CD0_SUM, "fastga.submodel.aerodynamics.sum.cd0.hydrogen")
+class Cd0TotalHydrogen(ExplicitComponent):
+    """
+    Profile drag estimation for the whole aircraft. It is the simple sum of all the profile drag
+    since every subpart was computed with the wing area as a reference and the interaction are
+    taken into account with interference factors
+
+    Based on : The drag build-up method in Gudmundsson, Snorri. General aviation aircraft design:
+    Applied Methods and Procedures. Butterworth-Heinemann, 2013.
+    """
+
+    def initialize(self):
+        self.options.declare("low_speed_aero", default=False, types=bool)
+
+    def setup(self):
+
+        if self.options["low_speed_aero"]:
+            self.add_input("data:aerodynamics:wing:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:fuselage:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:horizontal_tail:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:vertical_tail:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:nacelles:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:landing_gear:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:other:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:inlets:low_speed:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:hydrogen_storage:low_speed:CD0", val=np.nan)
+            self.add_output("data:aerodynamics:aircraft:low_speed:CD0")
+        else:
+            self.add_input("data:aerodynamics:wing:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:fuselage:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:horizontal_tail:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:vertical_tail:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:nacelles:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:landing_gear:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:other:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:inlets:cruise:CD0", val=np.nan)
+            self.add_input("data:aerodynamics:hydrogen_storage:cruise:CD0", val=np.nan)
+            self.add_output("data:aerodynamics:aircraft:cruise:CD0")
+
+        self.declare_partials("*", "*", method="fd")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        if self.options["low_speed_aero"]:
+            cd0_wing = inputs["data:aerodynamics:wing:low_speed:CD0"]
+            cd0_fus = inputs["data:aerodynamics:fuselage:low_speed:CD0"]
+            cd0_ht = inputs["data:aerodynamics:horizontal_tail:low_speed:CD0"]
+            cd0_vt = inputs["data:aerodynamics:vertical_tail:low_speed:CD0"]
+            cd0_nac = inputs["data:aerodynamics:nacelles:low_speed:CD0"]
+            cd0_lg = inputs["data:aerodynamics:landing_gear:low_speed:CD0"]
+            cd0_other = inputs["data:aerodynamics:other:low_speed:CD0"]
+            cd0_inlets = inputs["data:aerodynamics:inlets:low_speed:CD0"]
+            cd0_hydrogen_storage = inputs["data:aerodynamics:hydrogen_storage:low_speed:CD0"]
+        else:
+            cd0_wing = inputs["data:aerodynamics:wing:cruise:CD0"]
+            cd0_fus = inputs["data:aerodynamics:fuselage:cruise:CD0"]
+            cd0_ht = inputs["data:aerodynamics:horizontal_tail:cruise:CD0"]
+            cd0_vt = inputs["data:aerodynamics:vertical_tail:cruise:CD0"]
+            cd0_nac = inputs["data:aerodynamics:nacelles:cruise:CD0"]
+            cd0_lg = inputs["data:aerodynamics:landing_gear:cruise:CD0"]
+            cd0_other = inputs["data:aerodynamics:other:cruise:CD0"]
+            cd0_inlets = inputs["data:aerodynamics:inlets:cruise:CD0"]
+            cd0_hydrogen_storage = inputs["data:aerodynamics:hydrogen_storage:cruise:CD0"]
+
+        # CRUD (other undesirable drag). Factor from Gudmundsson book
+        crud_factor = 1.25
+
+        cd0 = crud_factor * (cd0_wing + cd0_fus + cd0_ht + cd0_vt + cd0_lg + cd0_nac + cd0_other + cd0_inlets
+                             + cd0_hydrogen_storage)
+
+        if self.options["low_speed_aero"]:
+            outputs["data:aerodynamics:aircraft:low_speed:CD0"] = cd0
+        else:
+            outputs["data:aerodynamics:aircraft:cruise:CD0"] = cd0

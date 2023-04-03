@@ -79,3 +79,71 @@ class Cd0Fuselage(ExplicitComponent):
             outputs["data:aerodynamics:fuselage:low_speed:CD0"] = cd0_fuselage + cd0_window
         else:
             outputs["data:aerodynamics:fuselage:cruise:CD0"] = cd0_fuselage + cd0_window
+
+
+@oad.RegisterSubmodel(SUBMODEL_CD0_FUSELAGE, "fastga.submodel.aerodynamics.fuselage.cd0.hydrogendorsal")
+class Cd0FuselageHydrogenDorsal(ExplicitComponent):
+    """
+    Profile drag estimation for the fuselage
+
+    Based on : Gudmundsson, Snorri. General aviation aircraft design: Applied Methods and
+    Procedures. Butterworth-Heinemann, 2013.
+    """
+
+    def initialize(self):
+        self.options.declare("low_speed_aero", default=False, types=bool)
+
+    def setup(self):
+
+        self.add_input("data:geometry:fuselage:maximum_height", val=np.nan, units="m")
+        self.add_input("data:geometry:fuselage:maximum_width", val=np.nan, units="m")
+        self.add_input("data:geometry:fuselage:length", val=np.nan, units="m")
+        self.add_input("data:geometry:fuselage:wet_area", val=np.nan, units="m**2")
+        self.add_input("data:geometry:wing:area", val=np.nan, units="m**2")
+        self.add_input("data:geometry:fuselage:a", val=np.nan, units="m") #additional code
+        if self.options["low_speed_aero"]:
+            self.add_input("data:aerodynamics:low_speed:unit_reynolds", val=np.nan, units="m**-1")
+            self.add_output("data:aerodynamics:fuselage:low_speed:CD0")
+        else:
+            self.add_input("data:aerodynamics:cruise:unit_reynolds", val=np.nan, units="m**-1")
+            self.add_output("data:aerodynamics:fuselage:cruise:CD0")
+
+        self.declare_partials("*", "*", method="fd")
+
+    def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
+
+        height = inputs["data:geometry:fuselage:maximum_height"]
+        width = inputs["data:geometry:fuselage:maximum_width"]
+        length = inputs["data:geometry:fuselage:length"]
+        wet_area_fus = inputs["data:geometry:fuselage:wet_area"]
+        wing_area = inputs["data:geometry:wing:area"]
+        storage_radius = inputs["data:geometry:fuselage:a"] #additional code
+        if self.options["low_speed_aero"]:
+            unit_reynolds = inputs["data:aerodynamics:low_speed:unit_reynolds"]
+        else:
+            unit_reynolds = inputs["data:aerodynamics:cruise:unit_reynolds"]
+
+        # Local Reynolds:
+        reynolds = unit_reynolds * length
+        # 5% NLF
+        x_trans = 0.05
+        # Roots
+        x0_turbulent = 36.9 * x_trans ** 0.625 * (1.0 / reynolds) ** 0.375
+        cf_fus = 0.074 / reynolds ** 0.2 * (1.0 - (x_trans - x0_turbulent)) ** 0.8
+        f = length / np.sqrt(4 * height * width / math.pi)
+        ff_fus = 1.0 + 60.0 / (f ** 3.0) + f / 400.0
+
+        # Hydrogen storage drag model as a blister (Gudmundsson p.718)
+        cds = 0.04
+        area_storage = math.pi * (2*storage_radius) ** 2
+        cd0_storage = cds * area_storage / wing_area
+
+        # Fuselage
+        cd0_fuselage = cf_fus * ff_fus * wet_area_fus / wing_area + cd0_storage
+        # Cockpit window (Gudmundsson p727)
+        cd0_window = 0.002 * (height * width) / wing_area
+
+        if self.options["low_speed_aero"]:
+            outputs["data:aerodynamics:fuselage:low_speed:CD0"] = cd0_fuselage + cd0_window
+        else:
+            outputs["data:aerodynamics:fuselage:cruise:CD0"] = cd0_fuselage + cd0_window
